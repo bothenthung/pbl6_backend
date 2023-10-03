@@ -1,11 +1,12 @@
 import * as JWT from "jsonwebtoken"
 
-// interface tokenPayload {
-//     userID: number
-//     password: String
-// }
+interface IPayload<T extends any = object> {}
 
-export const creatTokenPair = async (payload: any, privateKey: any) => {
+export const creatTokenPair = async (
+  payload: IPayload,
+  privateKey: string,
+  publicKey: string
+) => {
   try {
     const accessToken = await JWT.sign(payload, privateKey, {
       algorithm: "RS256",
