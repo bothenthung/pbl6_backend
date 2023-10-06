@@ -22,33 +22,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const data_source_1 = require("./data-source");
-const routes_1 = require("./routes");
-const helmet_1 = __importDefault(require("helmet"));
-const dotenv = __importStar(require("dotenv"));
-dotenv.config({ path: __dirname + "/.env" });
-const app = (0, express_1.default)();
-app.use((0, helmet_1.default)());
-app.use(express_1.default.json());
-data_source_1.AppDataSource.initialize()
-    .then(() => {
-    console.log("Data Source has been initialized");
-})
-    .catch((error) => {
-    console.log("Loi ket noi database", error);
-});
-app.use("/", routes_1.routes);
-app.use((error, req, res, next) => {
-    const statusCode = error.status || 500;
-    return res.status(statusCode).json({
-        status: "error",
-        code: statusCode,
-        message: error.message || "Internal Server Error",
-    });
-});
-exports.default = app;
+exports.ReasonPhrases = exports.StatusCodes = void 0;
+const StatusCodes = __importStar(require("./statusCodes"));
+exports.StatusCodes = StatusCodes;
+const ReasonPhrases = __importStar(require("./reasonPhrases"));
+exports.ReasonPhrases = ReasonPhrases;

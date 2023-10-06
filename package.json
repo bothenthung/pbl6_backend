@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/dotenv": "^8.2.0",
     "bcrypt": "^5.1.1",
     "crypto": "^1.0.1",
     "dotenv": "^16.3.1",
@@ -29,6 +30,7 @@
     "@types/bcrypt": "^5.0.0",
     "@types/compression": "^1.7.3",
     "@types/express": "^4.17.17",
+    "@types/helmet": "^4.0.0",
     "@types/jsonwebtoken": "^9.0.3",
     "@types/lodash": "^4.14.199",
     "@types/morgan": "^1.9.6",
