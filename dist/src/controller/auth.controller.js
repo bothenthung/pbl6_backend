@@ -13,17 +13,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth_service_1 = __importDefault(require("../service/auth.service"));
+const success_reponse_1 = require("../core/success.reponse");
 class AuthController {
     constructor() {
         this.signup = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                //   console.log("[P]::signUp::", req.body)
-                const result = yield auth_service_1.default.signup(req.body);
-                return res.status(200).json(result);
-            }
-            catch (error) {
-                console.log(error);
-            }
+            //return res.status(201).json(await authService.signup(req.body))
+            new success_reponse_1.CREATED({
+                message: "Regiserted OK!",
+                metadata: yield auth_service_1.default.signup(req.body),
+            }).send(res, {});
+        });
+        this.login = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            //return res.status(201).json(await authService.signup(req.body))
+            new success_reponse_1.OK({
+                message: "Login success!",
+                metadata: yield auth_service_1.default.login(req.body),
+            }).send(res, {});
         });
     }
 }

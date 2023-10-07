@@ -1,3 +1,5 @@
+import { StatusCodes, ReasonPhrases } from "../utils/httpStatusCode"
+
 const StatusCode = {
   FORBIDDEN: 403,
   CONFLICT: 409,
@@ -29,6 +31,24 @@ export class BadRequestError extends ErrorResponse {
   constructor(
     message = ReasonStatusCode.FORBIDDEN,
     statusCode = StatusCode.FORBIDDEN
+  ) {
+    super(message, statusCode)
+  }
+}
+
+export class AuthFailureError extends ErrorResponse {
+  constructor(
+    message = ReasonPhrases.UNAUTHORIZED,
+    statusCode = StatusCodes.UNAUTHORIZED
+  ) {
+    super(message, statusCode)
+  }
+}
+
+export class NotFoundError extends ErrorResponse {
+  constructor(
+    message = ReasonPhrases.NOT_FOUND,
+    statusCode = StatusCodes.NOT_ACCEPTABLE
   ) {
     super(message, statusCode)
   }
