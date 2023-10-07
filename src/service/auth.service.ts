@@ -6,11 +6,13 @@ import crypto from "crypto"
 import { Auth } from "../types/authType"
 import { getInfoData } from "../utils/getInfoData"
 import { AuthFailureError, BadRequestError } from "../core/error.response"
-import { findByEmail } from "./user.service"
+import { findByEmail, removeKeyById } from "./user.service"
 
 class AuthService {
-  // static logout = async ({}) => {
-  // }
+  static logout = async (user: any) => {
+    const delKeyUser = await removeKeyById(user.userID)
+    return delKeyUser
+  }
 
   static login = async ({ email, password, refreshToken = "" }: Auth) => {
     const foundedUser = await findByEmail({ email })
@@ -44,7 +46,7 @@ class AuthService {
     await AppDataSource.createQueryBuilder()
       .update(User)
       .set({ refreshToken: tokens?.refreshToken })
-      .where("UserID = :id", { id: foundedUser.userID })
+      .where("userID = :id", { id: foundedUser.userID })
       .execute()
 
     return {
@@ -79,6 +81,8 @@ class AuthService {
         format: "pem",
       },
     })
+    console.log("============================================")
+    console.log(privateKey)
 
     const publicKeyString = publicKey.toString()
 

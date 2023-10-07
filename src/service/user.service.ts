@@ -10,4 +10,10 @@ export const findById = async ({ userID }: { userID: number }) => {
   return await AppDataSource.getRepository(User).findOneBy({ userID })
 }
 
-export const removeKeyById = async ({ userID }: { userID: number }) => {}
+export const removeKeyById = async (userID: number) => {
+  return await AppDataSource.createQueryBuilder()
+    .update(User)
+    .set({ refreshToken: null, publicKey: null })
+    .where("userID = :id", { id: userID })
+    .execute()
+}

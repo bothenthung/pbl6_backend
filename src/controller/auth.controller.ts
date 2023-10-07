@@ -1,14 +1,14 @@
 import { NextFunction, Request, Response } from "express"
 import authService from "../service/auth.service"
-import { OK, CREATED } from "../core/success.reponse"
+import { OK, CREATED, SuccessResponse } from "../core/success.reponse"
 
 class AuthController {
-  // logout = async (req: Request, res: Response, next: NextFunction) => {
-  //   new OK({
-  //     message: "logout success ",
-  //     metadata: await authService.logout(req.user),
-  //   }).send(res, {})
-  // }
+  logout = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: "logout success ",
+      metadata: await authService.logout(req.user),
+    }).send(res, {})
+  }
 
   signup = async (req: Request, res: Response, next: NextFunction) => {
     new CREATED({

@@ -6,18 +6,20 @@ import { findById } from "../service/user.service"
 
 interface IPayload<T extends any = object> {}
 interface JwtPayload {
-  userID: string
+  UserID: string
 }
 
 declare module "express" {
   interface Request {
-    user: any // Thêm thuộc tính 'user' với kiểu dữ liệu tương ứng
+    user: any
+    publicKey: string
+    accessTokenString: string
   }
 }
 
 const HEADER = {
   CLIENT_KEY: "x-client-id",
-  AUTHORZIRATION: "authorxziration",
+  AUTHORZIRATION: "authorziration",
 }
 
 export const creatTokenPair = async (
@@ -47,7 +49,7 @@ export const authentication = asyncHandler(
     const userIdString = req.headers[HEADER.CLIENT_KEY]?.toString()
     if (!userIdString) throw new AuthFailureError("Invalid Request")
 
-    const userID = parseInt(userIdString, 10) // Chuyển đổi thành number
+    const userID = parseInt(userIdString, 10)
     const user = await findById({ userID })
     if (!user) throw new NotFoundError("Not found user")
 
@@ -56,14 +58,15 @@ export const authentication = asyncHandler(
     const accessTokenString = accessToken.toString()
 
     try {
-      const decodeUser = JWT.verify(
+      const decodeUser = (await JWT.verify(
         accessTokenString,
         user.publicKey
-      ) as JwtPayload
-      if (userIdString !== decodeUser.userID) {
+      )) as JwtPayload
+      if (userIdString !== decodeUser.UserID.toString()) {
         throw new AuthFailureError("Invalid userID")
       }
-      // req.user = user
+      req.user = user
+
       return next()
     } catch (error) {
       throw error
