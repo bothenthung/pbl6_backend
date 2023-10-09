@@ -6,11 +6,12 @@ import { findById } from "../service/user.service"
 
 interface IPayload<T extends any = object> {}
 interface JwtPayload {
-  UserID: string
+  userID: string
 }
 
 declare module "express" {
   interface Request {
+    refreshToken: string
     user: any
     publicKey: string
     accessTokenString: string
@@ -22,11 +23,7 @@ const HEADER = {
   AUTHORZIRATION: "authorziration",
 }
 
-export const creatTokenPair = async (
-  payload: IPayload,
-  privateKey: string,
-  publicKey: string
-) => {
+export const creatTokenPair = async (payload: IPayload, privateKey: string) => {
   try {
     const accessToken = await JWT.sign(payload, privateKey, {
       algorithm: "RS256",
@@ -40,7 +37,7 @@ export const creatTokenPair = async (
 
     return { accessToken, refreshToken }
   } catch (error) {
-    console.log("Loi create Token", error)
+    console.log("Create Token Error", error)
   }
 }
 
@@ -62,10 +59,26 @@ export const authentication = asyncHandler(
         accessTokenString,
         user.publicKey
       )) as JwtPayload
-      if (userIdString !== decodeUser.UserID.toString()) {
+
+      if (userIdString !== decodeUser.userID.toString()) {
         throw new AuthFailureError("Invalid userID")
       }
+
       req.user = user
+      return next()
+    } catch (error) {
+      throw error
+    }
+  }
+)
+
+export const receiveRefreshToken = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refreshToken = req.headers[HEADER.AUTHORZIRATION]
+      if (!refreshToken) throw new AuthFailureError("Invalid Request")
+      const refreshTokenString = refreshToken.toString()
+      req.refreshToken = refreshTokenString
 
       return next()
     } catch (error) {

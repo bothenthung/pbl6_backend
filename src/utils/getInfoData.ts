@@ -1,8 +1,8 @@
 import * as lodash from "lodash"
 
 export const getInfoData = ({
-  fields = [],
-  dataObject = {},
+  fields,
+  dataObject,
 }: {
   fields: string[]
   dataObject: any

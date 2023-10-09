@@ -53,3 +53,12 @@ export class NotFoundError extends ErrorResponse {
     super(message, statusCode)
   }
 }
+
+export class ForbiddenError extends ErrorResponse {
+  constructor(
+    message = ReasonPhrases.FORBIDDEN,
+    statusCode = StatusCodes.FORBIDDEN
+  ) {
+    super(message, statusCode)
+  }
+}

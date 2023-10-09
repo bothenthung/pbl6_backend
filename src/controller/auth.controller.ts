@@ -3,6 +3,17 @@ import authService from "../service/auth.service"
 import { OK, CREATED, SuccessResponse } from "../core/success.reponse"
 
 class AuthController {
+  handleRefreshToken = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    new SuccessResponse({
+      message: "Refresh Token success ",
+      metadata: await authService.handlerRefreshToken(req.refreshToken),
+    }).send(res, {})
+  }
+
   logout = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "logout success ",
