@@ -25,7 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getInfoData = void 0;
 const lodash = __importStar(require("lodash"));
-const getInfoData = ({ fields = [], dataObject = {}, }) => {
+const getInfoData = ({ fields, dataObject, }) => {
     return lodash.pick(dataObject, fields);
 };
 exports.getInfoData = getInfoData;

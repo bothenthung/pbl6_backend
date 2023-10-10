@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthFailureError = exports.BadRequestError = exports.ConflictRequestError = exports.ErrorResponse = void 0;
+exports.ForbiddenError = exports.NotFoundError = exports.AuthFailureError = exports.BadRequestError = exports.ConflictRequestError = exports.ErrorResponse = void 0;
 const httpStatusCode_1 = require("../utils/httpStatusCode");
 const StatusCode = {
     FORBIDDEN: 403,
@@ -35,3 +35,15 @@ class AuthFailureError extends ErrorResponse {
     }
 }
 exports.AuthFailureError = AuthFailureError;
+class NotFoundError extends ErrorResponse {
+    constructor(message = httpStatusCode_1.ReasonPhrases.NOT_FOUND, statusCode = httpStatusCode_1.StatusCodes.NOT_ACCEPTABLE) {
+        super(message, statusCode);
+    }
+}
+exports.NotFoundError = NotFoundError;
+class ForbiddenError extends ErrorResponse {
+    constructor(message = httpStatusCode_1.ReasonPhrases.FORBIDDEN, statusCode = httpStatusCode_1.StatusCodes.FORBIDDEN) {
+        super(message, statusCode);
+    }
+}
+exports.ForbiddenError = ForbiddenError;

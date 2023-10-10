@@ -9,10 +9,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findByEmail = void 0;
+exports.removeKeyById = exports.findByRefreshToken = exports.findById = exports.findByEmail = void 0;
 const data_source_1 = require("../data-source");
 const user_entity_1 = require("../entity/user.entity");
 const findByEmail = ({ email }) => __awaiter(void 0, void 0, void 0, function* () {
     return yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({ email });
 });
 exports.findByEmail = findByEmail;
+const findById = ({ userID }) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({ userID });
+});
+exports.findById = findById;
+const findByRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({ refreshToken });
+});
+exports.findByRefreshToken = findByRefreshToken;
+const removeKeyById = (userID) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield data_source_1.AppDataSource.createQueryBuilder()
+        .update(user_entity_1.User)
+        .set({ refreshToken: null, publicKey: null })
+        .where("userID = :id", { id: userID })
+        .execute();
+});
+exports.removeKeyById = removeKeyById;
