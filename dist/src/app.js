@@ -43,12 +43,23 @@ data_source_1.AppDataSource.initialize()
     console.log("Loi ket noi database", error);
 });
 app.use("/", routes_1.routes);
-app.use((error, req, res, next) => {
+const errorHandler = (error, req, res, next) => {
     const statusCode = error.status || 500;
     return res.status(statusCode).json({
         status: "error",
         code: statusCode,
         message: error.message || "Internal Server Error",
     });
-});
+};
+app.use(errorHandler);
+// app.use(
+//   (error: ErrorResponse, req: Request, res: Response, next: NextFunction) => {
+//     const statusCode: number = error.status || 500
+//     return res.status(statusCode).json({
+//       status: "error",
+//       code: statusCode,
+//       message: error.message || "Internal Server Error",
+//     })
+//   }
+// )
 exports.default = app;

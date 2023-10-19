@@ -32,9 +32,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.creatTokenPair = void 0;
+exports.receiveRefreshToken = exports.authentication = exports.creatTokenPair = exports.HEADER = void 0;
 const JWT = __importStar(require("jsonwebtoken"));
-const creatTokenPair = (payload, privateKey, publicKey) => __awaiter(void 0, void 0, void 0, function* () {
+const asyncHandler_1 = require("./asyncHandler");
+const error_response_1 = require("../core/error.response");
+const user_utils_1 = require("../utils/user.utils");
+exports.HEADER = {
+    CLIENT_KEY: "x-client-id",
+    AUTHORZIRATION: "authorziration",
+};
+const creatTokenPair = (payload, privateKey) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const accessToken = yield JWT.sign(payload, privateKey, {
             algorithm: "RS256",
@@ -47,7 +54,44 @@ const creatTokenPair = (payload, privateKey, publicKey) => __awaiter(void 0, voi
         return { accessToken, refreshToken };
     }
     catch (error) {
-        console.log("Loi create Token", error);
+        console.log("Create Token Error", error);
     }
 });
 exports.creatTokenPair = creatTokenPair;
+exports.authentication = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const userIdString = (_a = req.headers[exports.HEADER.CLIENT_KEY]) === null || _a === void 0 ? void 0 : _a.toString();
+    if (!userIdString)
+        throw new error_response_1.AuthFailureError("Invalid Request 1");
+    const user = yield (0, user_utils_1.findById)({ userID: userIdString });
+    if (!user)
+        throw new error_response_1.NotFoundError("Not found user");
+    const accessToken = req.headers[exports.HEADER.AUTHORZIRATION];
+    if (!accessToken)
+        throw new error_response_1.AuthFailureError("Invalid Request 2");
+    const accessTokenString = accessToken.toString();
+    try {
+        const decodeUser = (yield JWT.verify(accessTokenString, user.publicKey));
+        if (userIdString !== decodeUser.userID.toString()) {
+            throw new error_response_1.AuthFailureError("Invalid userID");
+        }
+        req.user = user;
+        return next();
+    }
+    catch (error) {
+        throw error;
+    }
+}));
+exports.receiveRefreshToken = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const refreshToken = req.headers[exports.HEADER.AUTHORZIRATION];
+        if (!refreshToken)
+            throw new error_response_1.AuthFailureError("Invalid Request");
+        const refreshTokenString = refreshToken.toString();
+        req.refreshToken = refreshTokenString;
+        return next();
+    }
+    catch (error) {
+        throw error;
+    }
+}));

@@ -8,21 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RemoveTestColumn1695704875724 = void 0;
-class RemoveTestColumn1695704875724 {
-    constructor() {
-        this.name = 'RemoveTestColumn1695704875724';
-    }
-    up(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`refreshTokennn\``);
-        });
-    }
-    down(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`ALTER TABLE \`user\` ADD \`refreshTokennn\` varchar(255) NOT NULL`);
-        });
-    }
-}
-exports.RemoveTestColumn1695704875724 = RemoveTestColumn1695704875724;
+exports.CreateKey = void 0;
+const crypto_1 = __importDefault(require("crypto"));
+const CreateKey = () => __awaiter(void 0, void 0, void 0, function* () {
+    const { privateKey, publicKey } = crypto_1.default.generateKeyPairSync("rsa", {
+        modulusLength: 4096,
+        publicKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+        },
+        privateKeyEncoding: {
+            type: "pkcs1",
+            format: "pem",
+        },
+    });
+    return { publicKey, privateKey };
+});
+exports.CreateKey = CreateKey;

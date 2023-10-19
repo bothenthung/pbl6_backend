@@ -1,10 +1,15 @@
 import { Request, Response, Router } from "express"
-import { AppDataSource } from "../../data-source"
-import { User } from "../../entity/user.entity"
+import userController from "../../controller/user.controller"
+import { asyncHandler } from "../../utils/asyncHandler"
 
 export const userRouter = Router()
 
-userRouter.get("/getAllUser", async (req: Request, res: Response) => {
-  const users = await AppDataSource.getRepository(User).find()
-  res.status(200).json({ users, text: "tin chuan" })
-})
+userRouter.get("/:username", asyncHandler(userController.getUserByID) as any)
+userRouter.patch(
+  "/updateuser",
+  asyncHandler(userController.updateUserByID) as any
+)
+userRouter.delete(
+  "/deleteuser",
+  asyncHandler(userController.deleteUserByID) as any
+)

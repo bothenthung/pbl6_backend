@@ -2,49 +2,78 @@ import { creatTokenPair } from "../utils/auth"
 import { AppDataSource } from "../data-source"
 import { User } from "../entity/user.entity"
 import bcrypt from "bcrypt"
-import crypto from "crypto"
+import crypto, { verify } from "crypto"
 import { Auth } from "../types/authType"
 import { getInfoData } from "../utils/getInfoData"
-import { AuthFailureError, BadRequestError } from "../core/error.response"
-import { findByEmail } from "./user.service"
+import { CreateKey } from "../utils/createKey"
+import {
+  AuthFailureError,
+  BadRequestError,
+  ForbiddenError,
+} from "../core/error.response"
+import {
+  findByEmail,
+  findByRefreshToken,
+  removeKeyById,
+} from "../utils/user.utils"
 
 class AuthService {
-  // static logout = async ({}) => {
-  // }
+  static handlerRefreshToken = async (refreshToken: string) => {
+    const user = await findByRefreshToken(refreshToken)
+    if (!user)
+      throw new ForbiddenError("Somethinh wrong happend !! Please relogin")
+    const key = await CreateKey()
+    const tokens = await creatTokenPair(
+      {
+        userID: user.userID,
+        email: user.email,
+        userName: user.userName,
+      },
+      key.privateKey
+    )
 
-  static login = async ({ email, password, refreshToken = "" }: Auth) => {
+    await AppDataSource.createQueryBuilder()
+      .update(User)
+      .set({ refreshToken: tokens?.refreshToken, publicKey: key.publicKey })
+      .where("userID = :id", { id: user.userID })
+      .execute()
+
+    return {
+      user: getInfoData({
+        fields: ["userID", "email", "userName"],
+        dataObject: user,
+      }),
+      tokens,
+    }
+  }
+
+  static logout = async (user: any) => {
+    const delKeyUser = await removeKeyById(user.userID)
+    return delKeyUser
+  }
+
+  static login = async ({ email, password }: Auth) => {
     const foundedUser = await findByEmail({ email })
     if (!foundedUser) throw new BadRequestError("Shop not registered")
 
     const matchPassword = await bcrypt.compare(password, foundedUser.password)
     if (!matchPassword) throw new AuthFailureError("Authentication error")
 
-    const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
-      modulusLength: 4096,
-      publicKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-      privateKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-    })
-
+    const key = await CreateKey()
     const tokens = await creatTokenPair(
       {
-        userID: foundedUser.email,
+        userID: foundedUser.userID,
         email: foundedUser.email,
         userName: foundedUser.userName,
       },
-      privateKey,
-      publicKey
+      key.privateKey
     )
+    const publicKeyString = key.publicKey.toString()
 
     await AppDataSource.createQueryBuilder()
       .update(User)
-      .set({ refreshToken: tokens?.refreshToken })
-      .where("UserID = :id", { id: foundedUser.userID })
+      .set({ refreshToken: tokens?.refreshToken, publicKey: publicKeyString })
+      .where("userID = :id", { id: foundedUser.userID })
       .execute()
 
     return {
@@ -68,19 +97,8 @@ class AuthService {
 
     const passwordHash = await bcrypt.hash(password, 10)
 
-    const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
-      modulusLength: 4096,
-      publicKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-      privateKeyEncoding: {
-        type: "pkcs1",
-        format: "pem",
-      },
-    })
-
-    const publicKeyString = publicKey.toString()
+    const key = await CreateKey()
+    const publicKeyString = key.publicKey.toString()
 
     const newUser = await currentUser.save({
       email: email,
@@ -90,11 +108,10 @@ class AuthService {
     })
 
     const tokens = await creatTokenPair(
-      { UserID: newUser.userID, email: email, username: userName },
-      privateKey,
-      publicKey
+      { userID: newUser.userID, email: email, username: userName },
+      key.privateKey
     )
-
+    console.log(tokens)
     if (tokens) {
       newUser.refreshToken = tokens.refreshToken
       await currentUser.save(newUser)

@@ -9,20 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TestAddColumn1695704347570 = void 0;
-class TestAddColumn1695704347570 {
-    constructor() {
-        this.name = 'TestAddColumn1695704347570';
-    }
-    up(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`ALTER TABLE \`user\` ADD \`refreshTokennn\` varchar(255) NOT NULL`);
-        });
-    }
-    down(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`ALTER TABLE \`user\` DROP COLUMN \`refreshTokennn\``);
-        });
-    }
-}
-exports.TestAddColumn1695704347570 = TestAddColumn1695704347570;
+exports.checkusernote = void 0;
+const data_source_1 = require("../data-source");
+const note_entity_1 = require("../entity/note.entity");
+const checkusernote = (noteId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const existingNote = yield data_source_1.AppDataSource.createQueryBuilder(note_entity_1.Note, "note")
+        .where("note.noteID = :noteId", { noteId: noteId })
+        .andWhere("note.user = :userId", { userId: userId })
+        .getOne();
+    return existingNote;
+});
+exports.checkusernote = checkusernote;

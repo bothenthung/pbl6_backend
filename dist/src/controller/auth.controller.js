@@ -16,15 +16,25 @@ const auth_service_1 = __importDefault(require("../service/auth.service"));
 const success_reponse_1 = require("../core/success.reponse");
 class AuthController {
     constructor() {
+        this.handleRefreshToken = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            new success_reponse_1.SuccessResponse({
+                message: "Refresh Token success ",
+                metadata: yield auth_service_1.default.handlerRefreshToken(req.refreshToken),
+            }).send(res, {});
+        });
+        this.logout = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            new success_reponse_1.SuccessResponse({
+                message: "logout success ",
+                metadata: yield auth_service_1.default.logout(req.user),
+            }).send(res, {});
+        });
         this.signup = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            //return res.status(201).json(await authService.signup(req.body))
             new success_reponse_1.CREATED({
-                message: "Regiserted OK!",
+                message: "User created successfully",
                 metadata: yield auth_service_1.default.signup(req.body),
             }).send(res, {});
         });
         this.login = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            //return res.status(201).json(await authService.signup(req.body))
             new success_reponse_1.OK({
                 message: "Login success!",
                 metadata: yield auth_service_1.default.login(req.body),
