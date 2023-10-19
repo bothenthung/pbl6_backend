@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { SuccessResponse } from "../core/success.reponse"
 import noteService from "../service/note.service"
-import { HEADER } from "../utils/auth"
+import { getUserIDString } from "../utils/auth"
 
 class NoteController {
   static getAllNoteByUserID = async (
@@ -9,7 +9,7 @@ class NoteController {
     res: Response,
     next: NextFunction
   ) => {
-    const userIdString = req.headers[HEADER.CLIENT_KEY]?.toString()
+    const userIdString = getUserIDString(req)
     new SuccessResponse({
       message: "Get all note success!",
       metadata: await noteService.getAllNoteByUserID(userIdString),
@@ -21,7 +21,7 @@ class NoteController {
     res: Response,
     next: NextFunction
   ) => {
-    const userIdString = req.headers[HEADER.CLIENT_KEY]?.toString()
+    const userIdString = getUserIDString(req)
     new SuccessResponse({
       message: "Get note success!",
       metadata: await noteService.getNoteByID(req.params.id, userIdString),
@@ -33,9 +33,11 @@ class NoteController {
     res: Response,
     next: NextFunction
   ) => {
+    const userIdString = getUserIDString(req)
+
     new SuccessResponse({
       message: "Created note success!",
-      metadata: await noteService.createNote(req.user, req.body),
+      metadata: await noteService.createNote(userIdString, req.body),
     }).send(res, {})
   }
 
@@ -44,9 +46,11 @@ class NoteController {
     res: Response,
     next: NextFunction
   ) => {
+    const userIdString = getUserIDString(req)
+
     new SuccessResponse({
       message: "Update note success!",
-      metadata: await noteService.updateNote(req.user, req.body),
+      metadata: await noteService.updateNote(userIdString, req.body),
     }).send(res, {})
   }
 
@@ -55,9 +59,11 @@ class NoteController {
     res: Response,
     next: NextFunction
   ) => {
+    const userIdString = getUserIDString(req)
+
     new SuccessResponse({
       message: "Delete success!",
-      metadata: await noteService.deleteByNoteID(req.user, req.body),
+      metadata: await noteService.deleteByNoteID(userIdString, req.body),
     }).send(res, {})
   }
 }

@@ -8,7 +8,7 @@ import { ErrorResponse } from "../core/error.response"
 import { BAD_REQUEST } from "../utils/statusCodes"
 
 class NoteService {
-  getAllNoteByUserID = async (userID: any) => {
+  getAllNoteByUserID = async (userID: string) => {
     const notes = await AppDataSource.createQueryBuilder(Note, "note")
       .where("note.user = :userId", { userId: userID })
       .getMany()
@@ -16,7 +16,7 @@ class NoteService {
     return { notes }
   }
 
-  getNoteByID = async (noteID: any, userID: any) => {
+  getNoteByID = async (noteID: string, userID: string) => {
     const note = await AppDataSource.createQueryBuilder(Note, "note")
       .where(" noteID = :noteId AND note.user = :userId", {
         userId: userID,
@@ -33,11 +33,11 @@ class NoteService {
     return { note }
   }
 
-  createNote = async (currentUser: any, note: any) => {
+  createNote = async (userId: any, note: any) => {
     const savedNote = await AppDataSource.getRepository(Note).save({
       title: note.title,
       content: note.content,
-      user: currentUser.userID,
+      user: userId,
     })
     return {
       note: getInfoData({
@@ -47,10 +47,10 @@ class NoteService {
     }
   }
 
-  updateNote = async (currentUser: any, note: any) => {
+  updateNote = async (userId: any, note: any) => {
     const existingNote = await AppDataSource.createQueryBuilder(Note, "note")
       .where("note.noteID = :noteId", { noteId: note.noteID })
-      .andWhere("note.user = :userId", { userId: currentUser.userID })
+      .andWhere("note.user = :userId", { userId: userId })
       .getOne()
     if (!existingNote) {
       throw new ErrorResponse(
@@ -63,7 +63,7 @@ class NoteService {
       .update(Note)
       .set({ title: note.title, content: note.content })
       .where("userID = :userId AND noteID = :noteId", {
-        userId: currentUser.userID,
+        userId: userId,
         noteId: note.noteID,
       })
       .execute()
@@ -77,16 +77,13 @@ class NoteService {
     }
   }
 
-  deleteByNoteID = async (
-    currentUser: any,
-    { noteID }: { noteID: number[] }
-  ) => {
+  deleteByNoteID = async (userId: any, { noteID }: { noteID: string[] }) => {
     const deleteResult = await AppDataSource.createQueryBuilder()
       .delete()
       .from(Note)
       .where("noteID IN (:...noteIDs) AND userID = :userId", {
         noteIDs: noteID,
-        userId: currentUser.userID,
+        userId: userId,
       })
       .execute()
 

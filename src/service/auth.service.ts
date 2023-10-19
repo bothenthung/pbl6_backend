@@ -54,7 +54,7 @@ class AuthService {
 
   static login = async ({ email, password }: Auth) => {
     const foundedUser = await findByEmail({ email })
-    if (!foundedUser) throw new BadRequestError("Shop not registered")
+    if (!foundedUser) throw new BadRequestError("User not registered")
 
     const matchPassword = await bcrypt.compare(password, foundedUser.password)
     if (!matchPassword) throw new AuthFailureError("Authentication error")
@@ -92,7 +92,7 @@ class AuthService {
     })
 
     if (oldUser) {
-      throw new BadRequestError("Error: Shop already registered!")
+      throw new BadRequestError("Error: User already registered!")
     }
 
     const passwordHash = await bcrypt.hash(password, 10)
