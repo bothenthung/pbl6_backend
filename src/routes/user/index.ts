@@ -9,7 +9,7 @@ userRouter.patch(
   "/updateuser",
   asyncHandler(userController.updateUserByID) as any
 )
-userRouter.delete(
-  "/deleteuser",
-  asyncHandler(userController.deleteUserByID) as any
-)
+// userRouter.delete(
+//   "/deleteuser",
+//   asyncHandler(userController.deleteUserByID) as any
+// )

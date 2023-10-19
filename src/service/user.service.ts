@@ -4,7 +4,7 @@ import { User } from "../entity/user.entity"
 import { getInfoData } from "../utils/getInfoData"
 
 class UserService {
-  getUserByUserName = async (username: string, userId: any) => {
+  getUserByUserName = async (username: string, userId: string) => {
     const user = await AppDataSource.getRepository(User).findOneBy({
       userName: username,
     })
@@ -13,13 +13,13 @@ class UserService {
     }
     return {
       data: getInfoData({
-        fields: ["userID", "email", "userName", "updated_at"],
+        fields: ["userID", "email", "userName"],
         dataObject: user,
       }),
     }
   }
 
-  updateUserByID = async (userupdate: any, userID: any) => {
+  updateUserByID = async (userupdate: any, userID: string) => {
     const user = await AppDataSource.createQueryBuilder(User, "user")
       .update()
       .set({ userName: userupdate.userName, email: userupdate.email })
@@ -29,16 +29,21 @@ class UserService {
     const currentuser = await AppDataSource.getRepository(User).findOneBy({
       userID: userID,
     })
-    return { currentuser }
+    return {
+      data: getInfoData({
+        fields: ["userID", "email", "userName"],
+        dataObject: currentuser,
+      }),
+    }
   }
 
-  deleteUserByID = async (userID: any) => {
-    await AppDataSource.createQueryBuilder(User, "user")
-      .delete()
-      .where("userID = :userId", { userId: userID })
-      .execute()
+  // deleteUserByID = async (userID: string) => {
+  //   await AppDataSource.createQueryBuilder(User, "user")
+  //     .delete()
+  //     .where("userID = :userId", { userId: userID })
+  //     .execute()
 
-    return {}
-  }
+  //   return {}
+  // }
 }
 export default new UserService()

@@ -1,7 +1,11 @@
 import * as JWT from "jsonwebtoken"
 import { asyncHandler } from "./asyncHandler"
 import { NextFunction, Request, Response } from "express"
-import { AuthFailureError, NotFoundError } from "../core/error.response"
+import {
+  AuthFailureError,
+  ErrorResponse,
+  NotFoundError,
+} from "../core/error.response"
 import { findById } from "../utils/user.utils"
 
 interface IPayload<T extends any = object> {}
@@ -43,7 +47,7 @@ export const creatTokenPair = async (payload: IPayload, privateKey: string) => {
 
 export const authentication = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const userIdString = req.headers[HEADER.CLIENT_KEY] as string
+    const userIdString = getUserIDString(req)
     if (!userIdString) throw new AuthFailureError("Invalid Request 1")
 
     const user = await findById({ userID: userIdString })
@@ -85,3 +89,9 @@ export const receiveRefreshToken = asyncHandler(
     }
   }
 )
+
+export const getUserIDString = (req: Request) => {
+  const userIdString = req.headers[HEADER.CLIENT_KEY]?.toString()
+  if (!userIdString) throw new ErrorResponse("userID not found", 400)
+  return userIdString
+}
