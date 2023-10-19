@@ -1,14 +1,15 @@
 import { DataSource } from "typeorm"
 import { User } from "./entity/user.entity"
 import { Note } from "./entity/note.entity"
+import { toNumber } from "lodash"
 
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: "localhost",
-  port: 3306,
-  username: "root",
-  password: "123456789",
-  database: "pbl6_be",
+  host: process.env.DB_HOST,
+  port: toNumber(process.env.DB_PORT),
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
   logging: true,
   entities: [User, Note],
   migrationsRun: true,
