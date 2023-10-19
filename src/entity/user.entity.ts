@@ -4,8 +4,8 @@ import { Note } from "./note.entity"
 
 @Entity("user")
 export class User {
-  @PrimaryGeneratedColumn()
-  userID: number
+  @PrimaryGeneratedColumn("uuid")
+  userID: string
 
   @Column()
   email: string
@@ -13,14 +13,14 @@ export class User {
   @Column()
   userName: string
 
-  @Column()
+  @Column("text")
   password: string
 
-  @Column()
-  refreshToken: string
+  @Column({ type: "text", nullable: true })
+  refreshToken: string | null
 
-  @Column()
-  publicKey: string
+  @Column({ type: "text", nullable: true })
+  publicKey: string | null
 
   @OneToMany(() => Note, (note) => note.user)
   notes: Note[]

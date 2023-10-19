@@ -9,20 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AddNoteEntity1695839176784 = void 0;
-class AddNoteEntity1695839176784 {
-    constructor() {
-        this.name = 'AddNoteEntity1695839176784';
-    }
-    up(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`ALTER TABLE \`user\` CHANGE \`id\` \`userID\` int NOT NULL AUTO_INCREMENT`);
-        });
-    }
-    down(queryRunner) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield queryRunner.query(`ALTER TABLE \`user\` CHANGE \`userID\` \`id\` int NOT NULL AUTO_INCREMENT`);
-        });
-    }
-}
-exports.AddNoteEntity1695839176784 = AddNoteEntity1695839176784;
+exports.findNoteById = void 0;
+const data_source_1 = require("../data-source");
+const note_entity_1 = require("../entity/note.entity");
+const findNoteById = (noteID) => __awaiter(void 0, void 0, void 0, function* () {
+    return yield data_source_1.AppDataSource.getRepository(note_entity_1.Note).findOneBy({ noteID });
+});
+exports.findNoteById = findNoteById;

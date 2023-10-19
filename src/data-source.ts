@@ -10,7 +10,6 @@ export const AppDataSource = new DataSource({
   password: "123456789",
   database: "pbl6_be",
   logging: true,
-  // entities: ["dist/src/entity/*.entity{.ts,.js}",],
   entities: [User, Note],
   migrationsRun: true,
   migrations: ["dist/src/migrations/*{.ts,.js}"],

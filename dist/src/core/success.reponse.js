@@ -10,7 +10,6 @@ const ReasonStatusCode = {
     CREATED: "Created!",
 };
 class SuccessResponse {
-    // constructor({ message, status, reasonStatusCode, metadata }: Icc) {
     constructor({ message = "", status = StatusCode.OK, reasonStatusCode = ReasonStatusCode.OK, metadata = {}, }) {
         this.message = message === "" ? reasonStatusCode : message;
         this.status = status;

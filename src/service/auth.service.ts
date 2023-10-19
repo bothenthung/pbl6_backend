@@ -5,14 +5,17 @@ import bcrypt from "bcrypt"
 import crypto, { verify } from "crypto"
 import { Auth } from "../types/authType"
 import { getInfoData } from "../utils/getInfoData"
+import { CreateKey } from "../utils/createKey"
 import {
   AuthFailureError,
   BadRequestError,
   ForbiddenError,
 } from "../core/error.response"
-import { findByEmail, findByRefreshToken, removeKeyById } from "./user.service"
-import * as JWT from "jsonwebtoken"
-import { CreateKey } from "../utils/createKey"
+import {
+  findByEmail,
+  findByRefreshToken,
+  removeKeyById,
+} from "../utils/user.utils"
 
 class AuthService {
   static handlerRefreshToken = async (refreshToken: string) => {
@@ -49,7 +52,7 @@ class AuthService {
     return delKeyUser
   }
 
-  static login = async ({ email, password, refreshToken = "" }: Auth) => {
+  static login = async ({ email, password }: Auth) => {
     const foundedUser = await findByEmail({ email })
     if (!foundedUser) throw new BadRequestError("Shop not registered")
 
@@ -108,7 +111,7 @@ class AuthService {
       { userID: newUser.userID, email: email, username: userName },
       key.privateKey
     )
-
+    console.log(tokens)
     if (tokens) {
       newUser.refreshToken = tokens.refreshToken
       await currentUser.save(newUser)

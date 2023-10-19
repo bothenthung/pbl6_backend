@@ -18,14 +18,14 @@ const data_source_1 = require("../data-source");
 const user_entity_1 = require("../entity/user.entity");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const getInfoData_1 = require("../utils/getInfoData");
-const error_response_1 = require("../core/error.response");
-const user_service_1 = require("./user.service");
 const createKey_1 = require("../utils/createKey");
+const error_response_1 = require("../core/error.response");
+const user_utils_1 = require("../utils/user.utils");
 class AuthService {
 }
 _a = AuthService;
 AuthService.handlerRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield (0, user_service_1.findByRefreshToken)(refreshToken);
+    const user = yield (0, user_utils_1.findByRefreshToken)(refreshToken);
     if (!user)
         throw new error_response_1.ForbiddenError("Somethinh wrong happend !! Please relogin");
     const key = yield (0, createKey_1.CreateKey)();
@@ -48,11 +48,11 @@ AuthService.handlerRefreshToken = (refreshToken) => __awaiter(void 0, void 0, vo
     };
 });
 AuthService.logout = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const delKeyUser = yield (0, user_service_1.removeKeyById)(user.userID);
+    const delKeyUser = yield (0, user_utils_1.removeKeyById)(user.userID);
     return delKeyUser;
 });
-AuthService.login = ({ email, password, refreshToken = "" }) => __awaiter(void 0, void 0, void 0, function* () {
-    const foundedUser = yield (0, user_service_1.findByEmail)({ email });
+AuthService.login = ({ email, password }) => __awaiter(void 0, void 0, void 0, function* () {
+    const foundedUser = yield (0, user_utils_1.findByEmail)({ email });
     if (!foundedUser)
         throw new error_response_1.BadRequestError("Shop not registered");
     const matchPassword = yield bcrypt_1.default.compare(password, foundedUser.password);
@@ -96,6 +96,7 @@ AuthService.signup = ({ userName, email, password }) => __awaiter(void 0, void 0
         publicKey: publicKeyString,
     });
     const tokens = yield (0, auth_1.creatTokenPair)({ userID: newUser.userID, email: email, username: userName }, key.privateKey);
+    console.log(tokens);
     if (tokens) {
         newUser.refreshToken = tokens.refreshToken;
         yield currentUser.save(newUser);

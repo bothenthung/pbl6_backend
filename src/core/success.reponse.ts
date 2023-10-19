@@ -16,7 +16,6 @@ export class SuccessResponse {
   status: number
   metadata: object
   reasonStatusCode: string
-  // constructor({ message, status, reasonStatusCode, metadata }: Icc) {
   constructor({
     message = "",
     status = StatusCode.OK,

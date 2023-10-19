@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from "typeorm"
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  JoinColumn,
+  UpdateDateColumn,
+} from "typeorm"
 import { User } from "./user.entity"
 
 @Entity("note")
@@ -6,15 +14,19 @@ export class Note {
   @PrimaryGeneratedColumn()
   noteID: number
 
-  @Column()
+  @Column("text")
   title: string
 
-  @Column()
-  content: string
+  @Column({ type: "text", nullable: true })
+  content: string | null
 
-  @Column()
-  created_at: string
+  @CreateDateColumn({ type: "timestamp" })
+  created_at: Date
+
+  @UpdateDateColumn({ type: "timestamp" })
+  updated_at: Date
 
   @ManyToOne(() => User, (user) => user.notes)
+  @JoinColumn({ name: "userID" })
   user: User
 }

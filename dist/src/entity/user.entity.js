@@ -16,8 +16,8 @@ let User = class User {
 };
 exports.User = User;
 __decorate([
-    (0, typeorm_1.PrimaryGeneratedColumn)(),
-    __metadata("design:type", Number)
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
+    __metadata("design:type", String)
 ], User.prototype, "userID", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
@@ -28,16 +28,16 @@ __decorate([
     __metadata("design:type", String)
 ], User.prototype, "userName", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)("text"),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", Object)
 ], User.prototype, "refreshToken", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    __metadata("design:type", Object)
 ], User.prototype, "publicKey", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => note_entity_1.Note, (note) => note.user),

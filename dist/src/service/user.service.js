@@ -9,26 +9,44 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeKeyById = exports.findByRefreshToken = exports.findById = exports.findByEmail = void 0;
+const error_response_1 = require("../core/error.response");
 const data_source_1 = require("../data-source");
 const user_entity_1 = require("../entity/user.entity");
-const findByEmail = ({ email }) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({ email });
-});
-exports.findByEmail = findByEmail;
-const findById = ({ userID }) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({ userID });
-});
-exports.findById = findById;
-const findByRefreshToken = (refreshToken) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({ refreshToken });
-});
-exports.findByRefreshToken = findByRefreshToken;
-const removeKeyById = (userID) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield data_source_1.AppDataSource.createQueryBuilder()
-        .update(user_entity_1.User)
-        .set({ refreshToken: null, publicKey: null })
-        .where("userID = :id", { id: userID })
-        .execute();
-});
-exports.removeKeyById = removeKeyById;
+const getInfoData_1 = require("../utils/getInfoData");
+class UserService {
+    constructor() {
+        this.getUserByUserName = (username, userId) => __awaiter(this, void 0, void 0, function* () {
+            const user = yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({
+                userName: username,
+            });
+            if ((user === null || user === void 0 ? void 0 : user.userID) != userId) {
+                throw new error_response_1.ErrorResponse("Invalid user", 400);
+            }
+            return {
+                data: (0, getInfoData_1.getInfoData)({
+                    fields: ["userID", "email", "userName", "updated_at"],
+                    dataObject: user,
+                }),
+            };
+        });
+        this.updateUserByID = (userupdate, userID) => __awaiter(this, void 0, void 0, function* () {
+            const user = yield data_source_1.AppDataSource.createQueryBuilder(user_entity_1.User, "user")
+                .update()
+                .set({ userName: userupdate.userName, email: userupdate.email })
+                .where("userID = :userId", { userId: userID })
+                .execute();
+            const currentuser = yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({
+                userID: userID,
+            });
+            return { currentuser };
+        });
+        this.deleteUserByID = (userID) => __awaiter(this, void 0, void 0, function* () {
+            yield data_source_1.AppDataSource.createQueryBuilder(user_entity_1.User, "user")
+                .delete()
+                .where("userID = :userId", { userId: userID })
+                .execute();
+            return {};
+        });
+    }
+}
+exports.default = new UserService();
