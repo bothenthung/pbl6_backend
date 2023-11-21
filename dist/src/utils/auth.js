@@ -39,7 +39,7 @@ const error_response_1 = require("../core/error.response");
 const user_utils_1 = require("../utils/user.utils");
 exports.HEADER = {
     CLIENT_KEY: "x-client-id",
-    AUTHORZIRATION: "authorziration",
+    AUTHORIZATION: "authorization",
 };
 const creatTokenPair = (payload, privateKey) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -61,13 +61,13 @@ exports.creatTokenPair = creatTokenPair;
 exports.authentication = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userIdString = (0, exports.getUserIDString)(req);
     if (!userIdString)
-        throw new error_response_1.AuthFailureError("Invalid Request 1");
+        throw new error_response_1.AuthFailureError("Invalid Request userID");
     const user = yield (0, user_utils_1.findById)({ userID: userIdString });
     if (!user)
         throw new error_response_1.NotFoundError("Not found user");
-    const accessToken = req.headers[exports.HEADER.AUTHORZIRATION];
+    const accessToken = req.headers[exports.HEADER.AUTHORIZATION];
     if (!accessToken)
-        throw new error_response_1.AuthFailureError("Invalid Request 2");
+        throw new error_response_1.AuthFailureError("Invalid Request authorization");
     const accessTokenString = accessToken.toString();
     try {
         const decodeUser = (yield JWT.verify(accessTokenString, user.publicKey));
@@ -83,7 +83,7 @@ exports.authentication = (0, asyncHandler_1.asyncHandler)((req, res, next) => __
 }));
 exports.receiveRefreshToken = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const refreshToken = req.headers[exports.HEADER.AUTHORZIRATION];
+        const refreshToken = req.headers[exports.HEADER.AUTHORIZATION];
         if (!refreshToken)
             throw new error_response_1.AuthFailureError("Invalid Request");
         const refreshTokenString = refreshToken.toString();

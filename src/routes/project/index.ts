@@ -12,3 +12,7 @@ projectRouter.post(
   "/add/user",
   asyncHandler(projectController.addUserToProject) as any
 )
+projectRouter.post(
+  "/add/column",
+  asyncHandler(projectController.addColumnToProject) as any
+)

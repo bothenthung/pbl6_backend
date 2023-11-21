@@ -4,9 +4,11 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm"
 import { User } from "./user.entity"
+import { Columns } from "./column.entity"
 
 @Entity("project")
 export class Project {
@@ -22,4 +24,7 @@ export class Project {
   @ManyToMany(() => User, { eager: true })
   @JoinTable()
   users: User[]
+
+  @OneToMany(() => Columns, (column) => column.project)
+  columns: Columns[]
 }

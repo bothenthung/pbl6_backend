@@ -4,6 +4,7 @@ import { User } from "../entity/user.entity"
 import { Project } from "../entity/project.entity"
 import { BadRequestError } from "../core/error.response"
 import { In } from "typeorm"
+import { Columns } from "../entity/column.entity"
 
 class ProjectService {
   static createProject = async (user: any, project: any) => {
@@ -89,6 +90,34 @@ class ProjectService {
     }
 
     return updatedProject
+  }
+
+  static addColumnToProject = async (columns: any) => {
+    const columnRepository = AppDataSource.getRepository(Columns)
+    const projectRepository = AppDataSource.getRepository(Project)
+    const project = await projectRepository.findOneBy({
+      projectID: columns.projectID,
+    })
+    if (!project) {
+      throw new BadRequestError("Project not found!")
+    }
+    const column = await columnRepository.save({
+      title: columns.title,
+      index: columns.index,
+      project: project,
+    })
+    if (!column) {
+      throw new BadRequestError("Add column failed!")
+    }
+    const columnadded = await columnRepository
+      .createQueryBuilder("columns")
+      .select(["columns.columnID", "columns.title", "columns.index"])
+      .where("columns.columnID = :columnID", { columnID: column.columnID })
+      .getOne()
+    if (!columnadded) {
+      throw new BadRequestError("Add column failed!")
+    }
+    return columnadded
   }
 }
 export default ProjectService

@@ -30,9 +30,11 @@ ProjectService.createProject = (user, project) => __awaiter(void 0, void 0, void
         users: [currentUser],
     });
     const saveProject = yield projectRepository.save(newProject);
-    const projectCreated = yield projectRepository.findOneBy({
+    const projectCreated = {
         projectID: saveProject.projectID,
-    });
+        title: saveProject.title,
+        created_at: saveProject.created_at,
+    };
     if (!projectCreated) {
         throw new error_response_1.BadRequestError("Project not created!");
     }
@@ -40,14 +42,16 @@ ProjectService.createProject = (user, project) => __awaiter(void 0, void 0, void
 });
 ProjectService.getAllProjectByUserID = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const projectRepository = data_source_1.AppDataSource.getRepository(project_entity_1.Project);
-    const project = yield projectRepository.find({
-        //   relations: ["users"],
-        where: { users: { userID: user.userID } },
-    });
-    if (!project) {
+    const projects = yield projectRepository
+        .createQueryBuilder("project")
+        .select(["project.projectID", "project.title"]) // Chọn các trường bạn muốn
+        .leftJoin("project.users", "user")
+        .where("user.userID = :userID", { userID: user.userID })
+        .getMany();
+    if (!projects) {
         throw new error_response_1.BadRequestError("Project not found");
     }
-    return project;
+    return projects;
 });
 ProjectService.addUserToProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { projectID, userIDs } = req.body;
@@ -76,7 +80,8 @@ ProjectService.addUserToProject = (req) => __awaiter(void 0, void 0, void 0, fun
         "project.projectID",
         "project.title",
         "user.userID",
-        "user.username",
+        "user.userName",
+        "user.email",
     ])
         .where("project.projectID = :projectID", { projectID })
         .getOne();

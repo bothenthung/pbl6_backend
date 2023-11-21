@@ -29,5 +29,15 @@ class ProjectController {
       metadata: await ProjectService.addUserToProject(req),
     }).send(res, {})
   }
+  addColumnToProject = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    new SuccessResponse({
+      message: "Add column success.",
+      metadata: await ProjectService.addColumnToProject(req.body),
+    }).send(res, {})
+  }
 }
 export default new ProjectController()
