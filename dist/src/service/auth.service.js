@@ -54,7 +54,7 @@ AuthService.logout = (user) => __awaiter(void 0, void 0, void 0, function* () {
 AuthService.login = ({ email, password }) => __awaiter(void 0, void 0, void 0, function* () {
     const foundedUser = yield (0, user_utils_1.findByEmail)({ email });
     if (!foundedUser)
-        throw new error_response_1.BadRequestError("Shop not registered");
+        throw new error_response_1.BadRequestError("User not registered");
     const matchPassword = yield bcrypt_1.default.compare(password, foundedUser.password);
     if (!matchPassword)
         throw new error_response_1.AuthFailureError("Authentication error");
@@ -84,7 +84,7 @@ AuthService.signup = ({ userName, email, password }) => __awaiter(void 0, void 0
         email: email,
     });
     if (oldUser) {
-        throw new error_response_1.BadRequestError("Error: Shop already registered!");
+        throw new error_response_1.BadRequestError("Error: User already registered!");
     }
     const passwordHash = yield bcrypt_1.default.hash(password, 10);
     const key = yield (0, createKey_1.CreateKey)();

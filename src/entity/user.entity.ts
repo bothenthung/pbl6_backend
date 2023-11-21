@@ -1,6 +1,5 @@
 import { json } from "express"
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
-import { Note } from "./note.entity"
 
 @Entity("user")
 export class User {
@@ -21,7 +20,4 @@ export class User {
 
   @Column({ type: "text", nullable: true })
   publicKey: string | null
-
-  @OneToMany(() => Note, (note) => note.user)
-  notes: Note[]
 }

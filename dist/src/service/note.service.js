@@ -35,11 +35,11 @@ class NoteService {
             }
             return { note };
         });
-        this.createNote = (currentUser, note) => __awaiter(this, void 0, void 0, function* () {
+        this.createNote = (userId, note) => __awaiter(this, void 0, void 0, function* () {
             const savedNote = yield data_source_1.AppDataSource.getRepository(note_entity_1.Note).save({
                 title: note.title,
                 content: note.content,
-                user: currentUser.userID,
+                user: userId,
             });
             return {
                 note: (0, getInfoData_1.getInfoData)({
@@ -48,10 +48,10 @@ class NoteService {
                 }),
             };
         });
-        this.updateNote = (currentUser, note) => __awaiter(this, void 0, void 0, function* () {
+        this.updateNote = (userId, note) => __awaiter(this, void 0, void 0, function* () {
             const existingNote = yield data_source_1.AppDataSource.createQueryBuilder(note_entity_1.Note, "note")
                 .where("note.noteID = :noteId", { noteId: note.noteID })
-                .andWhere("note.user = :userId", { userId: currentUser.userID })
+                .andWhere("note.user = :userId", { userId: userId })
                 .getOne();
             if (!existingNote) {
                 throw new error_response_1.ErrorResponse("Invalid noteID or it does not belong to the current user.", 400);
@@ -60,7 +60,7 @@ class NoteService {
                 .update(note_entity_1.Note)
                 .set({ title: note.title, content: note.content })
                 .where("userID = :userId AND noteID = :noteId", {
-                userId: currentUser.userID,
+                userId: userId,
                 noteId: note.noteID,
             })
                 .execute();
@@ -72,13 +72,13 @@ class NoteService {
                 }),
             };
         });
-        this.deleteByNoteID = (currentUser, { noteID }) => __awaiter(this, void 0, void 0, function* () {
+        this.deleteByNoteID = (userId, { noteID }) => __awaiter(this, void 0, void 0, function* () {
             const deleteResult = yield data_source_1.AppDataSource.createQueryBuilder()
                 .delete()
                 .from(note_entity_1.Note)
                 .where("noteID IN (:...noteIDs) AND userID = :userId", {
                 noteIDs: noteID,
-                userId: currentUser.userID,
+                userId: userId,
             })
                 .execute();
             if (deleteResult.affected === 0) {

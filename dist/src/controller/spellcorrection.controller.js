@@ -14,24 +14,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 const success_reponse_1 = require("../core/success.reponse");
-const user_service_1 = __importDefault(require("../service/user.service"));
-const auth_1 = require("../utils/auth");
-class UserController {
+const spellcorrection_service_1 = __importDefault(require("../service/spellcorrection.service"));
+class SpellCorrectionController {
 }
-_a = UserController;
-UserController.getUserByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userIdString = (0, auth_1.getUserIDString)(req);
-    const username = req.params.username;
-    new success_reponse_1.SuccessResponse({
-        message: "Get user success!",
-        metadata: yield user_service_1.default.getUserByUserName(username, userIdString),
-    }).send(res, {});
+_a = SpellCorrectionController;
+SpellCorrectionController.spellcorrection = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.file) {
+        const fileBuffer = req.file.buffer;
+        const fileText = fileBuffer.toString("utf-8");
+        new success_reponse_1.SuccessResponse({
+            message: "spell correction success",
+            metadata: yield spellcorrection_service_1.default.textCorrection(fileText),
+        }).send(res, {});
+    }
+    else if (req.body.content) {
+        console.log("hehe");
+    }
 });
-UserController.updateUserByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const userIdString = (0, auth_1.getUserIDString)(req);
-    new success_reponse_1.SuccessResponse({
-        message: "Update user success!",
-        metadata: yield user_service_1.default.updateUserByID(req.body, userIdString),
-    }).send(res, {});
-});
-exports.default = UserController;
+exports.default = SpellCorrectionController;

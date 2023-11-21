@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.receiveRefreshToken = exports.authentication = exports.creatTokenPair = exports.HEADER = void 0;
+exports.getUserIDString = exports.receiveRefreshToken = exports.authentication = exports.creatTokenPair = exports.HEADER = void 0;
 const JWT = __importStar(require("jsonwebtoken"));
 const asyncHandler_1 = require("./asyncHandler");
 const error_response_1 = require("../core/error.response");
@@ -59,8 +59,7 @@ const creatTokenPair = (payload, privateKey) => __awaiter(void 0, void 0, void 0
 });
 exports.creatTokenPair = creatTokenPair;
 exports.authentication = (0, asyncHandler_1.asyncHandler)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const userIdString = (_a = req.headers[exports.HEADER.CLIENT_KEY]) === null || _a === void 0 ? void 0 : _a.toString();
+    const userIdString = (0, exports.getUserIDString)(req);
     if (!userIdString)
         throw new error_response_1.AuthFailureError("Invalid Request 1");
     const user = yield (0, user_utils_1.findById)({ userID: userIdString });
@@ -95,3 +94,11 @@ exports.receiveRefreshToken = (0, asyncHandler_1.asyncHandler)((req, res, next) 
         throw error;
     }
 }));
+const getUserIDString = (req) => {
+    var _a;
+    const userIdString = (_a = req.headers[exports.HEADER.CLIENT_KEY]) === null || _a === void 0 ? void 0 : _a.toString();
+    if (!userIdString)
+        throw new error_response_1.ErrorResponse("userID not found", 400);
+    return userIdString;
+};
+exports.getUserIDString = getUserIDString;

@@ -20,37 +20,38 @@ class NoteController {
 }
 _a = NoteController;
 NoteController.getAllNoteByUserID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const userIdString = (_b = req.headers[auth_1.HEADER.CLIENT_KEY]) === null || _b === void 0 ? void 0 : _b.toString();
+    const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({
         message: "Get all note success!",
         metadata: yield note_service_1.default.getAllNoteByUserID(userIdString),
     }).send(res, {});
 });
 NoteController.getNoteByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const userIdString = (_c = req.headers[auth_1.HEADER.CLIENT_KEY]) === null || _c === void 0 ? void 0 : _c.toString();
+    const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({
         message: "Get note success!",
         metadata: yield note_service_1.default.getNoteByID(req.params.id, userIdString),
     }).send(res, {});
 });
 NoteController.createNote = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({
         message: "Created note success!",
-        metadata: yield note_service_1.default.createNote(req.user, req.body),
+        metadata: yield note_service_1.default.createNote(userIdString, req.body),
     }).send(res, {});
 });
 NoteController.updateNote = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({
         message: "Update note success!",
-        metadata: yield note_service_1.default.updateNote(req.user, req.body),
+        metadata: yield note_service_1.default.updateNote(userIdString, req.body),
     }).send(res, {});
 });
 NoteController.deleteNoteByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({
         message: "Delete success!",
-        metadata: yield note_service_1.default.deleteByNoteID(req.user, req.body),
+        metadata: yield note_service_1.default.deleteByNoteID(userIdString, req.body),
     }).send(res, {});
 });
 exports.default = NoteController;

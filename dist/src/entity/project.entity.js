@@ -9,35 +9,29 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.Project = void 0;
 const typeorm_1 = require("typeorm");
-let User = class User {
+const user_entity_1 = require("./user.entity");
+let Project = class Project {
 };
-exports.User = User;
+exports.Project = Project;
 __decorate([
     (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
-], User.prototype, "userID", void 0);
+], Project.prototype, "projectID", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], User.prototype, "email", void 0);
+], Project.prototype, "title", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], User.prototype, "userName", void 0);
+    (0, typeorm_1.CreateDateColumn)({ type: "timestamp" }),
+    __metadata("design:type", Date)
+], Project.prototype, "created_at", void 0);
 __decorate([
-    (0, typeorm_1.Column)("text"),
-    __metadata("design:type", String)
-], User.prototype, "password", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text", nullable: true }),
-    __metadata("design:type", Object)
-], User.prototype, "refreshToken", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text", nullable: true }),
-    __metadata("design:type", Object)
-], User.prototype, "publicKey", void 0);
-exports.User = User = __decorate([
-    (0, typeorm_1.Entity)("user")
-], User);
+    (0, typeorm_1.ManyToMany)(() => user_entity_1.User, { eager: true }),
+    (0, typeorm_1.JoinTable)(),
+    __metadata("design:type", Array)
+], Project.prototype, "users", void 0);
+exports.Project = Project = __decorate([
+    (0, typeorm_1.Entity)("project")
+], Project);
