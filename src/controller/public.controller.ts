@@ -4,10 +4,10 @@ import PublicService from "../service/public.service"
 
 class PublicController {
   checkEmailUser = async (req: Request, res: Response, next: NextFunction) => {
-    new SuccessResponse({
-      message: "Get all project success.",
+    res.status(200).json({
+      message: "Check email success.",
       metadata: await PublicService.checkEmailUser(req.body.email),
-    }).send(res, {})
+    })
   }
 }
 export default new PublicController()

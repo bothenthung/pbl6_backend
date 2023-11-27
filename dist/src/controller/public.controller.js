@@ -12,15 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const success_reponse_1 = require("../core/success.reponse");
 const public_service_1 = __importDefault(require("../service/public.service"));
 class PublicController {
     constructor() {
         this.checkEmailUser = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            new success_reponse_1.SuccessResponse({
+            res
+                .status(200)
+                .json({
                 message: "Get all project success.",
                 metadata: yield public_service_1.default.checkEmailUser(req.body.email),
-            }).send(res, {});
+            });
         });
     }
 }

@@ -15,8 +15,11 @@ export class Project {
   @PrimaryGeneratedColumn("uuid")
   projectID: string
 
-  @Column()
+  @Column({ type: "text", nullable: true })
   title: string
+
+  @Column({ type: "text", nullable: true })
+  description: string
 
   @CreateDateColumn({ type: "timestamp" })
   created_at: Date

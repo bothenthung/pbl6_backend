@@ -8,26 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-const data_source_1 = require("../data-source");
-const user_entity_1 = require("../entity/user.entity");
-const getInfoData_1 = require("../utils/getInfoData");
-class PublicService {
-}
-_a = PublicService;
-PublicService.checkEmailUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({
-        email: email,
-    });
-    if (!user) {
-        return null;
+exports.AddColumDescriptionProjectEntity1700800523039 = void 0;
+class AddColumDescriptionProjectEntity1700800523039 {
+    constructor() {
+        this.name = 'AddColumDescriptionProjectEntity1700800523039';
     }
-    return {
-        users: (0, getInfoData_1.getInfoData)({
-            fields: ["userID", "email", "userName"],
-            dataObject: user,
-        }),
-    };
-});
-exports.default = PublicService;
+    up(queryRunner) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield queryRunner.query(`ALTER TABLE \`project\` ADD \`description\` text NULL`);
+        });
+    }
+    down(queryRunner) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield queryRunner.query(`ALTER TABLE \`project\` DROP COLUMN \`description\``);
+        });
+    }
+}
+exports.AddColumDescriptionProjectEntity1700800523039 = AddColumDescriptionProjectEntity1700800523039;

@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Columns = void 0;
 const typeorm_1 = require("typeorm");
 const project_entity_1 = require("./project.entity");
+const task_entity_1 = require("./task.entity");
 let Columns = class Columns {
 };
 exports.Columns = Columns;
@@ -20,7 +21,7 @@ __decorate([
     __metadata("design:type", String)
 ], Columns.prototype, "columnID", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ type: "text", nullable: true }),
     __metadata("design:type", String)
 ], Columns.prototype, "title", void 0);
 __decorate([
@@ -32,6 +33,10 @@ __decorate([
     (0, typeorm_1.JoinColumn)({ name: "projectID" }),
     __metadata("design:type", project_entity_1.Project)
 ], Columns.prototype, "project", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => task_entity_1.Task, (task) => task.column),
+    __metadata("design:type", Array)
+], Columns.prototype, "tasks", void 0);
 exports.Columns = Columns = __decorate([
     (0, typeorm_1.Entity)("columns")
 ], Columns);

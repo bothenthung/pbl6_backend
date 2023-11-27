@@ -1,3 +1,4 @@
+import { BadRequestError } from "../core/error.response"
 import { SuccessResponse } from "../core/success.reponse"
 import { AppDataSource } from "../data-source"
 import { User } from "../entity/user.entity"
@@ -9,7 +10,7 @@ class PublicService {
       email: email,
     })
     if (!user) {
-      return []
+      return null
     }
     return {
       users: getInfoData({

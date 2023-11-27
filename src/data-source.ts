@@ -2,6 +2,7 @@ import { DataSource } from "typeorm"
 import { User } from "./entity/user.entity"
 import { Project } from "./entity/project.entity"
 import { Columns } from "./entity/column.entity"
+import { Task } from "./entity/task.entity"
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
   password: "123456789",
   database: "pbl6_be",
   logging: true,
-  entities: [User, Project, Columns],
+  entities: [User, Project, Columns, Task],
   migrationsRun: true,
   migrations: ["dist/src/migrations/*{.ts,.js}"],
 })
