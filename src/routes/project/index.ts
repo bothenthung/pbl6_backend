@@ -1,6 +1,7 @@
 import express, { Router } from "express"
 import { asyncHandler } from "../../utils/asyncHandler"
 import projectController from "../../controller/project.controller"
+import MessageController from "../../controller/message.controller"
 
 export const projectRouter: Router = express.Router()
 projectRouter.post("/add", asyncHandler(projectController.addProject) as any)
@@ -48,3 +49,8 @@ projectRouter.post(
   "/task/changeindex",
   asyncHandler(projectController.changeIndexTask) as any
 )
+
+projectRouter.get("/messages" , 
+asyncHandler(MessageController.getListMessage) as any
+)
+

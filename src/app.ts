@@ -1,11 +1,14 @@
+import compression from "compression"
+import cors from "cors"
+import env, * as dotenv from 'dotenv'
 import express, { ErrorRequestHandler } from "express"
+import helmet from "helmet"
+import http from 'http'
+import morgan from "morgan"
+import socketio from 'socket.io'
 import { AppDataSource } from "./data-source"
 import { routes } from "./routes"
-import compression from "compression"
-import morgan from "morgan"
-import helmet from "helmet"
-import * as dotenv from "dotenv"
-import cors from "cors"
+import { socketServices } from "./service/socket.service"
 
 dotenv.config({ path: __dirname + "/.env" })
 const app = express()
@@ -38,4 +41,17 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
 
 app.use(errorHandler)
 
-export default app
+const httpsServer = http.createServer(app);
+
+const io = new socketio.Server(httpsServer, {
+  cors: {
+    origin: '*',
+  }
+});
+
+
+(global as any).socket = io ;
+
+(global as any).socket.on('connection', socketServices);
+
+export default httpsServer;

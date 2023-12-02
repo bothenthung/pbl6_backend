@@ -53,7 +53,12 @@ ProjectService.getAllProjectByUserID = (user) => __awaiter(void 0, void 0, void 
     const projectRepository = data_source_1.AppDataSource.getRepository(project_entity_1.Project);
     const projects = yield projectRepository
         .createQueryBuilder("project")
-        .select(["project.projectID", "project.title", "project.created_at"])
+        .select([
+        "project.projectID",
+        "project.title",
+        "project.description",
+        "project.created_at",
+    ])
         .leftJoin("project.users", "user")
         .where("user.userID = :userID", { userID: user.userID })
         .getMany();
@@ -61,6 +66,60 @@ ProjectService.getAllProjectByUserID = (user) => __awaiter(void 0, void 0, void 
         throw new error_response_1.BadRequestError("Project not found!");
     }
     return projects;
+});
+ProjectService.getProjectDetails = (userID, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield (0, project_utils_1.checkUserInProject)(req.body.projectID, userID);
+    if (!user) {
+        throw new error_response_1.BadRequestError("User does not belong to project!");
+    }
+    // const project = await AppDataSource.getRepository(Project).findOne({
+    //   where: { projectID: projectID },
+    //   relations: ["columns", "columns.tasks"],
+    // })
+    // const project = await AppDataSource.getRepository(Project).findOne({
+    //   where: { projectID: projectID },
+    //   relations: ["columns", "columns.tasks"],
+    //   join: {
+    //     alias: "project",
+    //     leftJoinAndSelect: {
+    //       user: "project.users",
+    //     },
+    //   },
+    //   select: ["projectID", "user.userName", "user.email"],
+    // });
+    const project = yield data_source_1.AppDataSource.getRepository(project_entity_1.Project)
+        .createQueryBuilder("project")
+        .leftJoinAndSelect("project.columns", "columns")
+        .leftJoinAndSelect("columns.tasks", "tasks")
+        .leftJoinAndSelect("project.users", "users")
+        .select([
+        "project.projectID",
+        "project.title",
+        "project.description",
+        "project.created_at",
+        "columns.columnID",
+        "columns.title",
+        "columns.index",
+        "tasks.taskID",
+        "tasks.title",
+        "tasks.description",
+        "tasks.index",
+        "users.userID",
+        "users.userName",
+        "users.email",
+    ])
+        .where("project.projectID = :projectID", {
+        projectID: req.body.projectID,
+    })
+        .orderBy({
+        "columns.index": "ASC",
+        "tasks.index": "ASC",
+    })
+        .getOne();
+    if (!project) {
+        throw new error_response_1.BadRequestError("Project not found!");
+    }
+    return project;
 });
 ProjectService.addUserToProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { projectID, email } = req.body;
@@ -277,7 +336,7 @@ ProjectService.changeIndexTask = (req) => __awaiter(void 0, void 0, void 0, func
         .andWhere("task.index = :oldIndex", { oldIndex: oldIndex })
         .getOne();
     if (!task) {
-        throw new error_response_1.BadRequestError("Task not found!");
+        throw new error_response_1.BadRequestError("Task not found or Index is incorrect!");
     }
     if (targetColumnID == sourceColumnID) {
         if (oldIndex > newIndex) {

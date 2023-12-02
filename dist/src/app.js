@@ -26,14 +26,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const compression_1 = __importDefault(require("compression"));
+const cors_1 = __importDefault(require("cors"));
+const dotenv = __importStar(require("dotenv"));
 const express_1 = __importDefault(require("express"));
+const helmet_1 = __importDefault(require("helmet"));
+const morgan_1 = __importDefault(require("morgan"));
+const socket_io_1 = __importDefault(require("socket.io"));
 const data_source_1 = require("./data-source");
 const routes_1 = require("./routes");
-const compression_1 = __importDefault(require("compression"));
-const morgan_1 = __importDefault(require("morgan"));
-const helmet_1 = __importDefault(require("helmet"));
-const dotenv = __importStar(require("dotenv"));
-const cors_1 = __importDefault(require("cors"));
+const http_1 = __importDefault(require("http"));
+const socket_service_1 = require("./service/socket.service");
 dotenv.config({ path: __dirname + "/.env" });
 const app = (0, express_1.default)();
 app.use((0, helmet_1.default)());
@@ -59,4 +62,12 @@ const errorHandler = (error, req, res, next) => {
     });
 };
 app.use(errorHandler);
-exports.default = app;
+const httpsServer = http_1.default.createServer(app);
+const io = new socket_io_1.default.Server(httpsServer, {
+    cors: {
+        origin: '*',
+    }
+});
+global.socket = io;
+global.socket.on('connection', socket_service_1.socketServices);
+exports.default = httpsServer;

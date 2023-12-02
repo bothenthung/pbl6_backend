@@ -16,10 +16,8 @@ const public_service_1 = __importDefault(require("../service/public.service"));
 class PublicController {
     constructor() {
         this.checkEmailUser = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
-            res
-                .status(200)
-                .json({
-                message: "Get all project success.",
+            res.status(200).json({
+                message: "Check email success.",
                 metadata: yield public_service_1.default.checkEmailUser(req.body.email),
             });
         });

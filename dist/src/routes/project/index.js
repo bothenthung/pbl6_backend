@@ -7,9 +7,11 @@ exports.projectRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const asyncHandler_1 = require("../../utils/asyncHandler");
 const project_controller_1 = __importDefault(require("../../controller/project.controller"));
+const message_controller_1 = __importDefault(require("../../controller/message.controller"));
 exports.projectRouter = express_1.default.Router();
 exports.projectRouter.post("/add", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.addProject));
 exports.projectRouter.post("/getall", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.getAllProjectByUserID));
+exports.projectRouter.post("/getdetail", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.getProjectDetails));
 exports.projectRouter.delete("/delete/:projectID", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.deleteProject));
 exports.projectRouter.post("/user/add", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.addUserToProject));
 exports.projectRouter.post("/column/add", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.addColumnToProject));
@@ -19,3 +21,4 @@ exports.projectRouter.post("/column/changeindex", (0, asyncHandler_1.asyncHandle
 exports.projectRouter.post("/task/add", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.addTask));
 exports.projectRouter.post("/task/getAll", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.getAllTask));
 exports.projectRouter.post("/task/changeindex", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.changeIndexTask));
+exports.projectRouter.get("/messages", (0, asyncHandler_1.asyncHandler)(message_controller_1.default.getListMessage));

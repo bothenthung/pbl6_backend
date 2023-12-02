@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const app_1 = __importDefault(require("./src/app"));
 // const PORT = 3000
 // const PORT = process.env.PORT
-const PORT = 30;
+const PORT = 3009;
 app_1.default.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });

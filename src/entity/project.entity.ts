@@ -9,6 +9,7 @@ import {
 } from "typeorm"
 import { User } from "./user.entity"
 import { Columns } from "./column.entity"
+import { MessageEntity } from "./message.entity"
 
 @Entity("project")
 export class Project {
@@ -30,4 +31,7 @@ export class Project {
 
   @OneToMany(() => Columns, (column) => column.project)
   columns: Columns[]
+
+  @OneToMany(() => MessageEntity, message => message.project)
+  messages: MessageEntity[];
 }

@@ -22,6 +22,12 @@ class ProjectController {
                 metadata: yield project_service_1.default.addProject(req.user, req.body),
             }).send(res, {});
         });
+        this.getAllProjectByUserID = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            new success_reponse_1.SuccessResponse({
+                message: "Get all project success.",
+                metadata: yield project_service_1.default.getAllProjectByUserID(req.user),
+            }).send(res, {});
+        });
         this.deleteProject = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             const projectID = req.params.projectID;
             new success_reponse_1.SuccessResponse({
@@ -29,10 +35,11 @@ class ProjectController {
                 metadata: yield project_service_1.default.deletePoject(projectID, req.user.userID),
             }).send(res, {});
         });
-        this.getAllProjectByUserID = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+        this.getProjectDetails = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            // const projectID = req.params.projectID
             new success_reponse_1.SuccessResponse({
                 message: "Get all project success.",
-                metadata: yield project_service_1.default.getAllProjectByUserID(req.user),
+                metadata: yield project_service_1.default.getProjectDetails(req.user.userID, req),
             }).send(res, {});
         });
         this.addUserToProject = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
