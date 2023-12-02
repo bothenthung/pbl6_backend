@@ -24,7 +24,7 @@ declare module "express" {
 
 export const HEADER = {
   CLIENT_KEY: "x-client-id",
-  AUTHORZIRATION: "authorziration",
+  AUTHORIZATION: "authorization",
 }
 
 export const creatTokenPair = async (payload: IPayload, privateKey: string) => {
@@ -48,13 +48,14 @@ export const creatTokenPair = async (payload: IPayload, privateKey: string) => {
 export const authentication = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const userIdString = getUserIDString(req)
-    if (!userIdString) throw new AuthFailureError("Invalid Request 1")
+    if (!userIdString) throw new AuthFailureError("Invalid Request userID")
 
     const user = await findById({ userID: userIdString })
     if (!user) throw new NotFoundError("Not found user")
 
-    const accessToken = req.headers[HEADER.AUTHORZIRATION]
-    if (!accessToken) throw new AuthFailureError("Invalid Request 2")
+    const accessToken = req.headers[HEADER.AUTHORIZATION]
+    if (!accessToken)
+      throw new AuthFailureError("Invalid Request authorization")
     const accessTokenString = accessToken.toString()
 
     try {
@@ -78,7 +79,7 @@ export const authentication = asyncHandler(
 export const receiveRefreshToken = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const refreshToken = req.headers[HEADER.AUTHORZIRATION]
+      const refreshToken = req.headers[HEADER.AUTHORIZATION]
       if (!refreshToken) throw new AuthFailureError("Invalid Request")
       const refreshTokenString = refreshToken.toString()
       req.refreshToken = refreshTokenString

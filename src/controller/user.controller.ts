@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { SuccessResponse } from "../core/success.reponse"
 import userService from "../service/user.service"
-import { HEADER, getUserIDString } from "../utils/auth"
-import { ErrorResponse } from "../core/error.response"
+import { getUserIDString } from "../utils/auth"
 
 class UserController {
   static getUserByID = async (

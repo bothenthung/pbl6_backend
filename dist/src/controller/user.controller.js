@@ -16,15 +16,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const success_reponse_1 = require("../core/success.reponse");
 const user_service_1 = __importDefault(require("../service/user.service"));
 const auth_1 = require("../utils/auth");
-const error_response_1 = require("../core/error.response");
 class UserController {
 }
 _a = UserController;
 UserController.getUserByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const userIdString = (_b = req.headers[auth_1.HEADER.CLIENT_KEY]) === null || _b === void 0 ? void 0 : _b.toString();
-    if (!userIdString)
-        throw new error_response_1.ErrorResponse("Id bi loi mat tieu", 400);
+    const userIdString = (0, auth_1.getUserIDString)(req);
     const username = req.params.username;
     new success_reponse_1.SuccessResponse({
         message: "Get user success!",
@@ -32,19 +28,10 @@ UserController.getUserByID = (req, res, next) => __awaiter(void 0, void 0, void 
     }).send(res, {});
 });
 UserController.updateUserByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const userIdString = (_c = req.headers[auth_1.HEADER.CLIENT_KEY]) === null || _c === void 0 ? void 0 : _c.toString();
+    const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({
         message: "Update user success!",
         metadata: yield user_service_1.default.updateUserByID(req.body, userIdString),
-    }).send(res, {});
-});
-UserController.deleteUserByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
-    const userIdString = (_d = req.headers[auth_1.HEADER.CLIENT_KEY]) === null || _d === void 0 ? void 0 : _d.toString();
-    new success_reponse_1.SuccessResponse({
-        message: "Delete user success!",
-        metadata: yield user_service_1.default.deleteUserByID(userIdString),
     }).send(res, {});
 });
 exports.default = UserController;

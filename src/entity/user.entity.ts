@@ -1,6 +1,6 @@
-import { json } from "express"
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from "typeorm"
-import { Note } from "./note.entity"
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { MessageEntity } from "./message.entity"
+import { Task } from "./task.entity"
 
 @Entity("user")
 export class User {
@@ -22,6 +22,9 @@ export class User {
   @Column({ type: "text", nullable: true })
   publicKey: string | null
 
-  @OneToMany(() => Note, (note) => note.user)
-  notes: Note[]
+  @OneToMany(() => Task, (task) => task.user)
+  tasks: Task[]
+
+  @OneToMany(() => MessageEntity , (message) => message.user)
+  messages: MessageEntity[]  
 }

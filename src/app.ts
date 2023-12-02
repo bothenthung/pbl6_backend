@@ -1,22 +1,23 @@
-import express, {
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
-} from "express"
-import { AppDataSource } from "./data-source"
-import { User } from "./entity/user.entity"
-import { routes } from "./routes"
 import compression from "compression"
-import morgan from "morgan"
+import cors from "cors"
+import env, * as dotenv from 'dotenv'
+import express, { ErrorRequestHandler } from "express"
 import helmet from "helmet"
-import * as dotenv from "dotenv"
-import { ErrorResponse } from "./core/error.response"
+import http from 'http'
+import morgan from "morgan"
+import socketio from 'socket.io'
+import { AppDataSource } from "./data-source"
+import { routes } from "./routes"
+import { socketServices } from "./service/socket.service"
 
 dotenv.config({ path: __dirname + "/.env" })
 const app = express()
+
 app.use(helmet())
 app.use(express.json())
+app.use(cors())
+app.use(compression())
+app.use(morgan("dev"))
 
 AppDataSource.initialize()
   .then(() => {
@@ -33,21 +34,24 @@ const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   return res.status(statusCode).json({
     status: "error",
     code: statusCode,
+    stack: error.stack,
     message: error.message || "Internal Server Error",
   })
 }
 
 app.use(errorHandler)
 
-// app.use(
-//   (error: ErrorResponse, req: Request, res: Response, next: NextFunction) => {
-//     const statusCode: number = error.status || 500
-//     return res.status(statusCode).json({
-//       status: "error",
-//       code: statusCode,
-//       message: error.message || "Internal Server Error",
-//     })
-//   }
-// )
+const httpsServer = http.createServer(app);
 
-export default app
+const io = new socketio.Server(httpsServer, {
+  cors: {
+    origin: '*',
+  }
+});
+
+
+(global as any).socket = io ;
+
+(global as any).socket.on('connection', socketServices);
+
+export default httpsServer;

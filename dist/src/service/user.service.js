@@ -24,7 +24,7 @@ class UserService {
             }
             return {
                 data: (0, getInfoData_1.getInfoData)({
-                    fields: ["userID", "email", "userName", "updated_at"],
+                    fields: ["userID", "email", "userName"],
                     dataObject: user,
                 }),
             };
@@ -38,15 +38,20 @@ class UserService {
             const currentuser = yield data_source_1.AppDataSource.getRepository(user_entity_1.User).findOneBy({
                 userID: userID,
             });
-            return { currentuser };
+            return {
+                data: (0, getInfoData_1.getInfoData)({
+                    fields: ["userID", "email", "userName"],
+                    dataObject: currentuser,
+                }),
+            };
         });
-        this.deleteUserByID = (userID) => __awaiter(this, void 0, void 0, function* () {
-            yield data_source_1.AppDataSource.createQueryBuilder(user_entity_1.User, "user")
-                .delete()
-                .where("userID = :userId", { userId: userID })
-                .execute();
-            return {};
-        });
+        // deleteUserByID = async (userID: string) => {
+        //   await AppDataSource.createQueryBuilder(User, "user")
+        //     .delete()
+        //     .where("userID = :userId", { userId: userID })
+        //     .execute()
+        //   return {}
+        // }
     }
 }
 exports.default = new UserService();
