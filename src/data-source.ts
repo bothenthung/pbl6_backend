@@ -10,10 +10,10 @@ export const AppDataSource = new DataSource({
   host: "127.0.0.1",
   port: 3306,
   username: "root",
-  password: "12345678",
-  database: "pbl6",
+  password: "123456789",
+  database: "pbl6_be",
   logging: true,
-  entities: [User, Project, Columns, Task , MessageEntity],
+  entities: [User, Project, Columns, Task, MessageEntity],
   migrationsRun: true,
   migrations: ["dist/src/migrations/*{.ts,.js}"],
 })

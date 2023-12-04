@@ -25,56 +25,13 @@ const socketServices = (socket) => {
     socket.on('send-message', (data) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const message = yield message_service_1.messageService.create(data);
-            const messageRes = yield message_service_1.messageService.getOne(message.id);
-            console.log({ messageRes });
+            const messageRes = yield message_service_1.messageService.getOne({ projectID: data.projectID, id: message.id });
             global.socket.to(String(data.projectID)).emit('receive-message', messageRes);
         }
         catch (err) {
             console.log(err.message);
         }
     }));
-    // socket.on('send-message', async (data: IMessage) => {
-    //     try {
-    //         const message = await messageService.create({
-    //             userId: +data.userId || null,
-    //             content: data.content,
-    //             roomChatId: +data.hotelId,
-    //             receptionistId: +data.receptionistId || null
-    //         } as MessagesEntity);
-    //         const messageRes = await messageService.getOne(message.id);
-    //         global.socket.to(String(data.hotelId))
-    //             .emit('receive-message', messageFormat(messageRes));
-    //         deviceTokenService.getManyByRoomId(data.hotelId).then((devices) => {
-    //             const listId = new Map();
-    //             const arrUsers: IJoinRoom[] = Array.from(listUser.values());
-    //             arrUsers.map((user: IJoinRoom) => {
-    //                 if (user.onRoom) {
-    //                     listId.set(user.id, user.id);
-    //                 }
-    //             });
-    //             const tokenDevices: string[] = [];
-    //             devices.map(device => {
-    //                 if (device.userId !== messageRes.userId) {
-    //                     !listId.get(device.userId)
-    //                         && tokenDevices.push(device.token);
-    //                 }
-    //             });
-    //             firebaseSendMulticast(tokenDevices, {
-    //                 notification: {
-    //                     title: messageRes.user?.name
-    //                         || messageRes.receptionist?.name,
-    //                     body: messageRes.content,
-    //                 },
-    //                 data: {
-    //                     content: messageRes.content
-    //                 }
-    //             });
-    //         });
-    //     }
-    //     catch (err) {
-    //         console.log(err.message);
-    //     }
-    // });
     // socket.on('update-seen', async (data: IOnRoom) => {
     //     try {
     //         const user = listUser.get(socket.id);
@@ -101,18 +58,7 @@ const socketServices = (socket) => {
     socket.on('disconnect', () => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const user = listUser.get(socket.id);
-            // if (user.role === 'USER') {
-            //     await userService.updateLastSeen(
-            //         new Date(),
-            //         user.id
-            //     );
-            // }
-            // else {
-            //     await adminService.updateLastSeen(
-            //         new Date(),
-            //         user.id
-            //     );
-            // }
+            //     await userService.updateLastSeen()
             listUser.delete(socket.id);
         }
         catch (err) {

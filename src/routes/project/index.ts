@@ -50,7 +50,12 @@ projectRouter.post(
   asyncHandler(projectController.changeIndexTask) as any
 )
 
-projectRouter.get("/messages" , 
-asyncHandler(MessageController.getListMessage) as any
+projectRouter.delete(
+  "/task/delete/:taskID",
+  asyncHandler(projectController.deleteTaskByTaskID) as any
 )
 
+projectRouter.get(
+  "/messages",
+  asyncHandler(MessageController.getListMessage) as any
+)

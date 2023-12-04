@@ -34,7 +34,7 @@ const pagination = (query, options) => __awaiter(void 0, void 0, void 0, functio
     const total = yield query.clone().getCount();
     let dataList = query
         .clone()
-        .offset(options.page * options.itemsPerPage)
+        .offset((options.page - 1) * options.itemsPerPage)
         .limit(options.itemsPerPage);
     if (options.orderBy) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
