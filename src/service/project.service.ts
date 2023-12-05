@@ -67,21 +67,6 @@ class ProjectService {
     if (!user) {
       throw new BadRequestError("User does not belong to project!")
     }
-    // const project = await AppDataSource.getRepository(Project).findOne({
-    //   where: { projectID: projectID },
-    //   relations: ["columns", "columns.tasks"],
-    // })
-    // const project = await AppDataSource.getRepository(Project).findOne({
-    //   where: { projectID: projectID },
-    //   relations: ["columns", "columns.tasks"],
-    //   join: {
-    //     alias: "project",
-    //     leftJoinAndSelect: {
-    //       user: "project.users",
-    //     },
-    //   },
-    //   select: ["projectID", "user.userName", "user.email"],
-    // });
 
     const project = await AppDataSource.getRepository(Project)
       .createQueryBuilder("project")
@@ -432,10 +417,6 @@ class ProjectService {
   static getAllTask = async (req: Request) => {
     const { columnID } = req.body
     const userID = req.user.userID
-    // const user = await checkUserInProject(projectID, userID)
-    // if (!user) {
-    //   throw new BadRequestError("User does not belong to project!")
-    // }
 
     const column = await AppDataSource.getRepository(Columns)
       .createQueryBuilder("columns")
@@ -450,6 +431,45 @@ class ProjectService {
     }
 
     return column
+  }
+
+  static deleteTaskByTaskID = async (req: Request, taskID: string) => {
+    const taskRepository = AppDataSource.getRepository(Task)
+    const checkUserInProject = await taskRepository
+      .createQueryBuilder("task")
+      .leftJoinAndSelect("task.column", "column")
+      .leftJoinAndSelect("column.project", "project")
+      .leftJoinAndSelect("project.users", "user")
+      .where("task.taskID = :taskID", { taskID: taskID })
+      .andWhere("user.userID = :userID", {
+        userID: req.user.userID,
+      })
+      .getOne()
+    if (!checkUserInProject) {
+      throw new BadRequestError("User not belong to project or Task not found!")
+    }
+
+    const taskDelete = await taskRepository
+      .createQueryBuilder("task")
+      .where("task.taskID = :taskID", { taskID })
+      .getOne()
+    if (!taskDelete) {
+      throw new BadRequestError("Task not found!")
+    }
+    await taskRepository
+      .createQueryBuilder()
+      .update(Task)
+      .set({ index: () => "`index` - 1" })
+      .where("`index` > :taskIndex", { taskIndex: taskDelete.index })
+      .execute()
+
+    await taskRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Task)
+      .where("taskID = :taskID", { taskID })
+      .execute()
+    return {}
   }
 }
 

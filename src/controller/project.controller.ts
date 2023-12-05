@@ -109,5 +109,18 @@ class ProjectController {
       metadata: await ProjectService.changeIndexTask(req),
     }).send(res, {})
   }
+
+  deleteTaskByTaskID = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const taskID = req.params.taskID
+
+    new SuccessResponse({
+      message: "Delete task success.",
+      metadata: await ProjectService.deleteTaskByTaskID(req, taskID),
+    }).send(res, {})
+  }
 }
 export default new ProjectController()

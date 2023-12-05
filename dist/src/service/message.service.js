@@ -31,38 +31,45 @@ exports.messageService = {
         if (!project)
             throw new error_response_1.ErrorResponse("Invalid Project", 400);
         const messageRepo = data_source_1.AppDataSource.getRepository(message_entity_1.MessageEntity);
-        const newTask = messageRepo.create({
+        const newMessage = messageRepo.create({
             message: message.message,
             user,
             project,
         });
-        return newTask;
+        const saveMessage = yield messageRepo.save(newMessage);
+        return saveMessage;
     }),
     getMany: (projectID, paginationInfo) => __awaiter(void 0, void 0, void 0, function* () {
-        // const messages = await .getMany(roomChatId, paginationInfo);
-        console.log({
-            x: yield data_source_1.AppDataSource.getRepository(message_entity_1.MessageEntity).count(),
-            y: "vai cadasdas vai cadasdasvai cadasdasvai cadasdasvai cadasdasvai cadasdasvai cadasdasvai cadasdasvai cadasdas"
-        });
         const entity = yield data_source_1.AppDataSource.getRepository(message_entity_1.MessageEntity).createQueryBuilder('message')
-            .where("project.projectID = :projectID", {
-            projectID: projectID,
-        })
             .leftJoinAndSelect('message.user', 'user')
             .leftJoinAndSelect('message.project', 'project')
+            .where('project.projectID = :projectID', { projectID })
             .select([
+            'message.createdAt',
+            'message.id',
             'message.message',
+            'project.projectID',
             'user.userName',
+            'user.userID',
         ]);
         const messages = (0, pagination_1.pagination)(entity, paginationInfo);
         return messages;
     }),
-    getOne: (projectID) => __awaiter(void 0, void 0, void 0, function* () {
+    getOne: ({ projectID, id }) => __awaiter(void 0, void 0, void 0, function* () {
         const messages = yield data_source_1.AppDataSource.getRepository(message_entity_1.MessageEntity)
             .createQueryBuilder("message")
-            .where("projectID = :projectID", {
-            projectID: projectID,
-        })
+            .leftJoinAndSelect('message.user', 'user')
+            .leftJoinAndSelect('message.project', 'project')
+            .where('project.projectID = :projectID', { projectID })
+            .where('message.id = :id', { id })
+            .select([
+            'message.createdAt',
+            'message.id',
+            'message.message',
+            'project.projectID',
+            'user.userName',
+            'user.userID',
+        ])
             .getOne();
         return messages;
     }),
