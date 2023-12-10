@@ -9,45 +9,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MessageEntity = void 0;
+exports.UserProject = void 0;
 const typeorm_1 = require("typeorm");
-const baseEntity_1 = require("../types/baseEntity");
 const project_entity_1 = require("./project.entity");
 const user_entity_1 = require("./user.entity");
-let MessageEntity = class MessageEntity extends baseEntity_1.BaseEntity {
+let UserProject = class UserProject {
 };
-exports.MessageEntity = MessageEntity;
+exports.UserProject = UserProject;
 __decorate([
-    (0, typeorm_1.Column)({ type: "text", nullable: true }),
+    (0, typeorm_1.PrimaryGeneratedColumn)("uuid"),
     __metadata("design:type", String)
-], MessageEntity.prototype, "message", void 0);
+], UserProject.prototype, "id", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "text", nullable: false }),
     __metadata("design:type", String)
-], MessageEntity.prototype, "userSendId", void 0);
-__decorate([
-    (0, typeorm_1.Column)({ type: "text", nullable: true }),
-    __metadata("design:type", String)
-], MessageEntity.prototype, "userReceiveId", void 0);
+], UserProject.prototype, "userID", void 0);
 __decorate([
     (0, typeorm_1.Column)({ type: "text", nullable: false }),
     __metadata("design:type", String)
-], MessageEntity.prototype, "projectID", void 0);
+], UserProject.prototype, "projectID", void 0);
 __decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.sendMessages),
-    (0, typeorm_1.JoinColumn)({ name: "userSendId", referencedColumnName: 'userID' }),
+    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.userProjects),
+    (0, typeorm_1.JoinColumn)({ name: "userID", referencedColumnName: 'userID' }),
     __metadata("design:type", user_entity_1.User)
-], MessageEntity.prototype, "userSend", void 0);
-__decorate([
-    (0, typeorm_1.ManyToOne)(() => user_entity_1.User, (user) => user.receiveMessages),
-    (0, typeorm_1.JoinColumn)({ name: "userReceiveId", referencedColumnName: 'userID' }),
-    __metadata("design:type", user_entity_1.User)
-], MessageEntity.prototype, "userReceive", void 0);
+], UserProject.prototype, "user", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => project_entity_1.Project, (project) => project.userProjects),
     (0, typeorm_1.JoinColumn)({ name: "projectID", referencedColumnName: 'projectID' }),
     __metadata("design:type", project_entity_1.Project)
-], MessageEntity.prototype, "project", void 0);
-exports.MessageEntity = MessageEntity = __decorate([
-    (0, typeorm_1.Entity)("message")
-], MessageEntity);
+], UserProject.prototype, "project", void 0);
+exports.UserProject = UserProject = __decorate([
+    (0, typeorm_1.Entity)("user_project")
+], UserProject);

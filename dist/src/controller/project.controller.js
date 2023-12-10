@@ -91,6 +91,13 @@ class ProjectController {
                 metadata: yield project_service_1.default.changeIndexTask(req),
             }).send(res, {});
         });
+        this.deleteTaskByTaskID = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+            const taskID = req.params.taskID;
+            new success_reponse_1.SuccessResponse({
+                message: "Delete task success.",
+                metadata: yield project_service_1.default.deleteTaskByTaskID(req, taskID),
+            }).send(res, {});
+        });
     }
 }
 exports.default = new ProjectController();

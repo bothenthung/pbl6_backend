@@ -2,6 +2,7 @@ import { ErrorResponse } from "../core/error.response"
 import { AppDataSource } from "../data-source"
 import { User } from "../entity/user.entity"
 import { getInfoData } from "../utils/getInfoData"
+import { IQueryOptions, pagination } from "../utils/pagination"
 
 class UserService {
   getUserByUserName = async (username: string, userId: string) => {
@@ -45,5 +46,14 @@ class UserService {
 
   //   return {}
   // }
+
+  getListUserByProjectID = async (projectID: string, paginationInfo: IQueryOptions) => {
+    const entity = await AppDataSource.getRepository(User).createQueryBuilder('user')
+    .innerJoin("user.userProjects", "userProject")
+    .where("userProject.projectID = :projectID", { projectID })
+
+  const messages = pagination(entity, paginationInfo);
+  return messages;
+  }
 }
 export default new UserService()

@@ -18,9 +18,9 @@ export const socketServices = (socket: any) => {
   socket.on('send-message', async (data: IMessage) => {
     try {
       const message = await messageService.create(data);
-      const messageRes = await messageService.getOne({projectID: data.projectID , id: message.id});
+      // const messageRes = await messageService.getOne({projectID: data.projectID , id: message.id});
 
-        (global as any).socket.to(String(data.projectID)).emit('receive-message', messageRes);
+        // (global as any).socket.to(String(data.projectID)).emit('receive-message', messageRes);
     }
     catch (err: any) {
         console.log(err.message);

@@ -25,8 +25,8 @@ const socketServices = (socket) => {
     socket.on('send-message', (data) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const message = yield message_service_1.messageService.create(data);
-            const messageRes = yield message_service_1.messageService.getOne({ projectID: data.projectID, id: message.id });
-            global.socket.to(String(data.projectID)).emit('receive-message', messageRes);
+            // const messageRes = await messageService.getOne({projectID: data.projectID , id: message.id});
+            // (global as any).socket.to(String(data.projectID)).emit('receive-message', messageRes);
         }
         catch (err) {
             console.log(err.message);
