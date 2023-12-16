@@ -5,29 +5,29 @@ import { Columns } from "../entity/column.entity"
 import { Project } from "../entity/project.entity"
 import { Task } from "../entity/task.entity"
 import { User } from "../entity/user.entity"
-import { IQueryOptions, pagination } from "../utils/pagination"
-import { CheckProjectExists, checkUserInProject } from "../utils/project.utils"
 import { UserProject } from "../entity/userProject.entity"
+import { CheckProjectExists, checkUserInProject } from "../utils/project.utils"
 
 class ProjectService {
   static addProject = async (user: any, project: any) => {
-    const projectRepository = AppDataSource.getRepository(Project)
+    const projectRepository = AppDataSource.getRepository(Project);
+    const userProjectRepository = AppDataSource.getRepository(UserProject);
 
     const newProject = projectRepository.create({
       title: project.title,
       users: [user],
     })
-    const saveProject = await projectRepository.save(newProject)
 
-    const projectCreated = {
-      projectID: saveProject.projectID,
-      title: saveProject.title,
-      created_at: saveProject.created_at,
-    }
-    if (!projectCreated) {
-      throw new BadRequestError("Project not created!")
-    }
-    return projectCreated
+    const savedProject = await projectRepository.save(newProject)
+
+    const userProject = userProjectRepository.create({
+      userID: user.userID,
+      projectID: savedProject.projectID,
+    });
+
+    await userProjectRepository.save(userProject);
+
+    return savedProject;
   }
 
   static deletePoject = async (projectID: string, userID: string) => {
@@ -45,7 +45,6 @@ class ProjectService {
 
   static getAllProjectByUserID = async (user: any) => {
     const projectRepository = AppDataSource.getRepository(Project)
-    console.log("asdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasd")
     const projects = await projectRepository
       .createQueryBuilder("project")
       .select([
@@ -54,12 +53,11 @@ class ProjectService {
         "project.description",
         "project.created_at",
       ])
-      .innerJoin("project.userProjects", "user_project")
-      .where("user_project.userID = :userID", { userID: user.userID })
-      .getMany()
-
-    console.log("asdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasdasdasdasadsasdasdasdasdasdasdasdasd")
-
+      .innerJoin(UserProject, "userProject", "userProject.projectID = project.projectID")
+      .innerJoin(User, "user", "user.userID = userProject.userID")
+      .where("user.userID = :userID", { userID: user.userID })
+      .getMany();
+      
     if (!projects) {
       throw new BadRequestError("Project not found!")
     }
@@ -112,28 +110,26 @@ class ProjectService {
   static addUserToProject = async (req: Request) => {
     const { projectID, email } = req.body
 
-    const projectRepository = AppDataSource.getRepository(Project)
-    const userProjectRepository = AppDataSource.getRepository(UserProject)
-    const userRepository = AppDataSource.getRepository(User)
+    const userRepository = AppDataSource.getRepository(User);
+    const projectRepository = AppDataSource.getRepository(Project);
+    const userProjectRepository = AppDataSource.getRepository(UserProject);
 
     const project = await projectRepository.findOneBy({
       projectID: projectID,
     })
+    if (!project) throw new BadRequestError("Project not found!");
 
-    if (!project) {
-      throw new BadRequestError("Project not found!")
-    }
-    const users = await userRepository.findOneBy({ email: email })
-    if (!users) {
-      throw new BadRequestError("User is not registered!")
-    }
+    const user = await userRepository.findOneBy({ email: email });
+    if (!user) throw new BadRequestError("User is not registered!")
 
-    const userProject = await userProjectRepository.save({
+
+    const userProject = userProjectRepository.create({
+      userID: user.userID,
       projectID: project.projectID,
-      userID: users.userID,
-    })
+    });
 
-
+    const addedUserToProject = await userProjectRepository.save(userProject);
+    return addedUserToProject;
     // project.users.push(users)
     // await projectRepository.save(project)
 
@@ -152,7 +148,6 @@ class ProjectService {
     // if (!updatedProject) {
     //   throw new BadRequestError("Error getting user list after adding!")
     // }
-    return userProject
   }
 
   static addColumnToProject = async (reqBody: any) => {
@@ -210,7 +205,6 @@ class ProjectService {
 
   static deleteColumn = async (req: Request, columnID: string) => {
     const projectID = req.body.projectID
-    console.log(columnID)
 
     const user = await checkUserInProject(req.body.projectID, req.user.userID)
     if (!user) {
@@ -430,7 +424,6 @@ class ProjectService {
 
   static getAllTask = async (req: Request) => {
     const { columnID } = req.body
-    const userID = req.user.userID
 
     const column = await AppDataSource.getRepository(Columns)
       .createQueryBuilder("columns")

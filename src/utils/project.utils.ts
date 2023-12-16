@@ -1,16 +1,17 @@
-import { BadRequestError } from "../core/error.response"
-import { AppDataSource } from "../data-source"
-import { Project } from "../entity/project.entity"
+import { BadRequestError } from "../core/error.response";
+import { AppDataSource } from "../data-source";
+import { Project } from "../entity/project.entity";
+import { UserProject } from "../entity/userProject.entity";
 
 export const checkUserInProject = async (projectID: string, userID: string) => {
-  const currentUser = await AppDataSource.getRepository(Project)
-    .createQueryBuilder("project")
-    .leftJoinAndSelect("project.users", "user")
-    .where("project.projectID = :projectID", { projectID: projectID })
-    .andWhere("user.userID = :userID", { userID: userID })
-    .getOne()
-  const isUserInProject = Boolean(currentUser)
-  return isUserInProject
+  const userProjectRepository =AppDataSource.getRepository(UserProject);
+
+  const userInProject = await userProjectRepository
+    .createQueryBuilder("userProject")
+    .where("userProject.userID = :userID AND userProject.projectID = :projectID", { userID, projectID })
+    .getOne();
+
+  return !!userInProject;
 }
 
 export const CheckProjectExists = async (projectID: string) => {

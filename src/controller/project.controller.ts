@@ -139,7 +139,7 @@ class ProjectController {
 
     new SuccessResponse({
       message: "Get user success!",
-      metadata: await userService.getListUserByProjectID(req.query.projectID as string, paginationInfo),
+      metadata: await userService.getListUserByProjectID(req, paginationInfo),
     }).send(res, {})
   }
 }
