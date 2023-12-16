@@ -10,6 +10,7 @@ import {
 import { User } from "./user.entity"
 import { Columns } from "./column.entity"
 import { MessageEntity } from "./message.entity"
+import { UserProject } from "./userProject.entity"
 
 @Entity("project")
 export class Project {
@@ -31,6 +32,9 @@ export class Project {
 
   @OneToMany(() => Columns, (column) => column.project)
   columns: Columns[]
+
+  @OneToMany(() => UserProject , (userProject) => userProject.user)
+  userProjects: UserProject[]  
 
   @OneToMany(() => MessageEntity, message => message.project)
   messages: MessageEntity[];

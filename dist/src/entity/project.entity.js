@@ -14,6 +14,7 @@ const typeorm_1 = require("typeorm");
 const user_entity_1 = require("./user.entity");
 const column_entity_1 = require("./column.entity");
 const message_entity_1 = require("./message.entity");
+const userProject_entity_1 = require("./userProject.entity");
 let Project = class Project {
 };
 exports.Project = Project;
@@ -42,6 +43,10 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => column_entity_1.Columns, (column) => column.project),
     __metadata("design:type", Array)
 ], Project.prototype, "columns", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => userProject_entity_1.UserProject, (userProject) => userProject.user),
+    __metadata("design:type", Array)
+], Project.prototype, "userProjects", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => message_entity_1.MessageEntity, message => message.project),
     __metadata("design:type", Array)

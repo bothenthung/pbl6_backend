@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express"
 import { SuccessResponse } from "../core/success.reponse"
 import ProjectService from "../service/project.service"
+import userService from "../service/user.service"
+import { IQueryOptions } from "../utils/pagination"
 
 class ProjectController {
   addProject = async (req: Request, res: Response, next: NextFunction) => {
@@ -120,6 +122,24 @@ class ProjectController {
     new SuccessResponse({
       message: "Delete task success.",
       metadata: await ProjectService.deleteTaskByTaskID(req, taskID),
+    }).send(res, {})
+  }
+
+  getListUser = async (
+    req: Request,
+    res: Response,
+  ) => {
+
+    const paginationInfo: IQueryOptions = {
+      orderType: 'DESC',
+      orderBy: 'user.userName',
+      page: req.query.page ? +req.query.page : - 1,
+      itemsPerPage: req.query.itemsPerPage ? +req.query.itemsPerPage : 10
+    };
+
+    new SuccessResponse({
+      message: "Get user success!",
+      metadata: await userService.getListUserByProjectID(req.query.projectID as string, paginationInfo),
     }).send(res, {})
   }
 }

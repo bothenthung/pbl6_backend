@@ -31,13 +31,14 @@ exports.messageService = {
         if (!project)
             throw new error_response_1.ErrorResponse("Invalid Project", 400);
         const messageRepo = data_source_1.AppDataSource.getRepository(message_entity_1.MessageEntity);
-        const newMessage = messageRepo.create({
-            message: message.message,
-            user,
-            project,
-        });
-        const saveMessage = yield messageRepo.save(newMessage);
-        return saveMessage;
+        // const newMessage = messageRepo.create({
+        //   message: message.message,
+        //   user,
+        //   project,
+        // })
+        // const saveMessage = await messageRepo.save(newMessage);
+        // return saveMessage;
+        return "";
     }),
     getMany: (projectID, paginationInfo) => __awaiter(void 0, void 0, void 0, function* () {
         const entity = yield data_source_1.AppDataSource.getRepository(message_entity_1.MessageEntity).createQueryBuilder('message')

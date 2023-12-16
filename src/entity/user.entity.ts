@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 import { MessageEntity } from "./message.entity"
 import { Task } from "./task.entity"
+import { UserProject } from "./userProject.entity"
 
 @Entity("user")
 export class User {
@@ -25,6 +26,12 @@ export class User {
   @OneToMany(() => Task, (task) => task.user)
   tasks: Task[]
 
-  @OneToMany(() => MessageEntity , (message) => message.user)
-  messages: MessageEntity[]  
+  @OneToMany(() => MessageEntity , (message) => message.userSend)
+  sendMessages: MessageEntity[]  
+  
+  @OneToMany(() => MessageEntity , (message) => message.userReceive)
+  receiveMessages: MessageEntity[]  
+
+  @OneToMany(() => UserProject , (userProject) => userProject.user)
+  userProjects: UserProject[]  
 }

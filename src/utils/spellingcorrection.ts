@@ -4,7 +4,7 @@ const axios = require("axios")
 
 export const spellingcorrection = async (textToCheck: string) => {
   try {
-    const apiUrl = "http://localhost:8000/spelling"
+    const apiUrl = "https://185c-117-2-255-218.ngrok-free.app/spelling"
     const res = await axios.get(apiUrl, {
       params: {
         text: textToCheck,

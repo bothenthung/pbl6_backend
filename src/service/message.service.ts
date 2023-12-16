@@ -23,15 +23,16 @@ export const messageService = {
     
       const messageRepo = AppDataSource.getRepository(MessageEntity)
   
-      const newMessage = messageRepo.create({
-        message: message.message,
-        user,
-        project,
-      })
+      // const newMessage = messageRepo.create({
+      //   message: message.message,
+      //   user,
+      //   project,
+      // })
     
-      const saveMessage = await messageRepo.save(newMessage);
+      // const saveMessage = await messageRepo.save(newMessage);
 
-      return saveMessage;
+      // return saveMessage;
+      return ""
   },
 
   getMany: async (projectID: string, paginationInfo: IQueryOptions) => {

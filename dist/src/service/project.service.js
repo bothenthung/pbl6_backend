@@ -72,21 +72,6 @@ ProjectService.getProjectDetails = (userID, req) => __awaiter(void 0, void 0, vo
     if (!user) {
         throw new error_response_1.BadRequestError("User does not belong to project!");
     }
-    // const project = await AppDataSource.getRepository(Project).findOne({
-    //   where: { projectID: projectID },
-    //   relations: ["columns", "columns.tasks"],
-    // })
-    // const project = await AppDataSource.getRepository(Project).findOne({
-    //   where: { projectID: projectID },
-    //   relations: ["columns", "columns.tasks"],
-    //   join: {
-    //     alias: "project",
-    //     leftJoinAndSelect: {
-    //       user: "project.users",
-    //     },
-    //   },
-    //   select: ["projectID", "user.userName", "user.email"],
-    // });
     const project = yield data_source_1.AppDataSource.getRepository(project_entity_1.Project)
         .createQueryBuilder("project")
         .leftJoinAndSelect("project.columns", "columns")
@@ -104,6 +89,7 @@ ProjectService.getProjectDetails = (userID, req) => __awaiter(void 0, void 0, vo
         "tasks.title",
         "tasks.description",
         "tasks.index",
+        "tasks.deadline_date",
         "users.userID",
         "users.userName",
         "users.email",
@@ -398,10 +384,6 @@ ProjectService.changeIndexTask = (req) => __awaiter(void 0, void 0, void 0, func
 ProjectService.getAllTask = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { columnID } = req.body;
     const userID = req.user.userID;
-    // const user = await checkUserInProject(projectID, userID)
-    // if (!user) {
-    //   throw new BadRequestError("User does not belong to project!")
-    // }
     const column = yield data_source_1.AppDataSource.getRepository(column_entity_1.Columns)
         .createQueryBuilder("columns")
         .leftJoinAndSelect("columns.tasks", "task")
@@ -414,5 +396,41 @@ ProjectService.getAllTask = (req) => __awaiter(void 0, void 0, void 0, function*
         throw new error_response_1.BadRequestError("Column not found!");
     }
     return column;
+});
+ProjectService.deleteTaskByTaskID = (req, taskID) => __awaiter(void 0, void 0, void 0, function* () {
+    const taskRepository = data_source_1.AppDataSource.getRepository(task_entity_1.Task);
+    const checkUserInProject = yield taskRepository
+        .createQueryBuilder("task")
+        .leftJoinAndSelect("task.column", "column")
+        .leftJoinAndSelect("column.project", "project")
+        .leftJoinAndSelect("project.users", "user")
+        .where("task.taskID = :taskID", { taskID: taskID })
+        .andWhere("user.userID = :userID", {
+        userID: req.user.userID,
+    })
+        .getOne();
+    if (!checkUserInProject) {
+        throw new error_response_1.BadRequestError("User not belong to project or Task not found!");
+    }
+    const taskDelete = yield taskRepository
+        .createQueryBuilder("task")
+        .where("task.taskID = :taskID", { taskID })
+        .getOne();
+    if (!taskDelete) {
+        throw new error_response_1.BadRequestError("Task not found!");
+    }
+    yield taskRepository
+        .createQueryBuilder()
+        .update(task_entity_1.Task)
+        .set({ index: () => "`index` - 1" })
+        .where("`index` > :taskIndex", { taskIndex: taskDelete.index })
+        .execute();
+    yield taskRepository
+        .createQueryBuilder()
+        .delete()
+        .from(task_entity_1.Task)
+        .where("taskID = :taskID", { taskID })
+        .execute();
+    return {};
 });
 exports.default = ProjectService;

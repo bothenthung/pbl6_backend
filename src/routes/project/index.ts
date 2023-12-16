@@ -59,3 +59,8 @@ projectRouter.get(
   "/messages",
   asyncHandler(MessageController.getListMessage) as any
 )
+
+projectRouter.get(
+  "/users",
+  asyncHandler(projectController.getListUser) as any
+)

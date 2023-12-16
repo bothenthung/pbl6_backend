@@ -13,7 +13,7 @@ exports.spellingcorrection = void 0;
 const axios = require("axios");
 const spellingcorrection = (textToCheck) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const apiUrl = "http://localhost:8000/spelling";
+        const apiUrl = "https://185c-117-2-255-218.ngrok-free.app/spelling";
         const res = yield axios.get(apiUrl, {
             params: {
                 text: textToCheck,

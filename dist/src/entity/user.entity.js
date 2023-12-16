@@ -13,6 +13,7 @@ exports.User = void 0;
 const typeorm_1 = require("typeorm");
 const message_entity_1 = require("./message.entity");
 const task_entity_1 = require("./task.entity");
+const userProject_entity_1 = require("./userProject.entity");
 let User = class User {
 };
 exports.User = User;
@@ -45,9 +46,17 @@ __decorate([
     __metadata("design:type", Array)
 ], User.prototype, "tasks", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => message_entity_1.MessageEntity, (message) => message.user),
+    (0, typeorm_1.OneToMany)(() => message_entity_1.MessageEntity, (message) => message.userSend),
     __metadata("design:type", Array)
-], User.prototype, "messages", void 0);
+], User.prototype, "sendMessages", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => message_entity_1.MessageEntity, (message) => message.userReceive),
+    __metadata("design:type", Array)
+], User.prototype, "receiveMessages", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => userProject_entity_1.UserProject, (userProject) => userProject.user),
+    __metadata("design:type", Array)
+], User.prototype, "userProjects", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)("user")
 ], User);
