@@ -1,6 +1,7 @@
 import { ErrorResponse } from "../core/error.response"
 import { AppDataSource } from "../data-source"
 import { User } from "../entity/user.entity"
+import { UserProject } from "../entity/userProject.entity"
 import { getInfoData } from "../utils/getInfoData"
 import { IQueryOptions, pagination } from "../utils/pagination"
 
@@ -47,13 +48,17 @@ class UserService {
   //   return {}
   // }
 
-  getListUserByProjectID = async (projectID: string, paginationInfo: IQueryOptions) => {
-    const entity = await AppDataSource.getRepository(User).createQueryBuilder('user')
-    .innerJoin("user.userProjects", "userProject")
-    .where("userProject.projectID = :projectID", { projectID })
+  getListUserByProjectID = async (req: any, paginationInfo: IQueryOptions) => {
+    const userRepository = AppDataSource.getRepository(User);
 
-  const messages = pagination(entity, paginationInfo);
-  return messages;
+    const entity = await userRepository
+    .createQueryBuilder("user")
+    .innerJoin(UserProject, "userProject", "userProject.userID = user.userID")
+    .where("userProject.projectID = :projectID", { projectID: req.query.projectID as string })
+    .andWhere("user.userID <> :excludeUserID", { excludeUserID: req.user.userID as string })
+    
+    const users = pagination(entity, paginationInfo);
+    return users;
   }
 }
 export default new UserService()

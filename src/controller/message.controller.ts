@@ -18,7 +18,7 @@ class MessageController {
 
     new SuccessResponse({
       message: "Get user success!",
-      metadata: await messageService.getMany(req.query.projectID as string, paginationInfo),
+      metadata: await messageService.getMany(req as any, paginationInfo),
     }).send(res, {})
   }
 }

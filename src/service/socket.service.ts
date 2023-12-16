@@ -1,26 +1,45 @@
-import { IJoinRoom, IMessage } from "../types/socket";
+import { MessageEntity } from "../entity/message.entity";
+import { IJoinRoomChat } from "../types/socket";
+import { sortId } from "../utils/user.utils";
 import { messageService } from "./message.service";
 
-const listUser = new Map<string, IJoinRoom>();
+const listUser = new Map<string, IJoinRoomChat>();
 
 export const socketServices = (socket: any) => {
-  socket.on('join', (user: IJoinRoom) => {
+  socket.on('join-room-chat' , async (user: IJoinRoomChat) => {
     try {
+      let roomName = user.projectID + 'group-chat';
+
+      if(user.userID2) {
+        roomName = user.projectID + sortId(user.userID1, user.userID2);
+      }
+
+      console.log("roomName" , roomName);
+
       listUser.set(socket.id, user);
-      socket.join(String(user.projectID));
-  }
-  catch (err: any) {
+      socket.join(roomName);
+    } catch (err: any) {
       console.log(err.message);
-  }
-  });
+    }
+  })
 
-
-  socket.on('send-message', async (data: IMessage) => {
+  socket.on('send-message', async (data: any) => {
     try {
-      const message = await messageService.create(data);
-      // const messageRes = await messageService.getOne({projectID: data.projectID , id: message.id});
+      const message = await messageService.create(data) as any as MessageEntity;
 
-        // (global as any).socket.to(String(data.projectID)).emit('receive-message', messageRes);
+      let roomName = message.projectID + 'group-chat';
+
+      if(message.userReceiveId) {
+        roomName = message.projectID + sortId(message.userSendId, message.userReceiveId);
+      }
+
+      const messageRes = await messageService.getLatestMessagePersonal({
+          userSendId: message.userSendId,
+          userReceiveId: message.userReceiveId,
+          projectID: message.projectID,
+      });
+
+      (global as any).socket.to(roomName).emit('receive-message', messageRes);
     }
     catch (err: any) {
         console.log(err.message);

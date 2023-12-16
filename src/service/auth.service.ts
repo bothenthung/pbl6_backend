@@ -1,16 +1,15 @@
-import { creatTokenPair } from "../utils/auth"
-import { AppDataSource } from "../data-source"
-import { User } from "../entity/user.entity"
 import bcrypt from "bcrypt"
-import crypto, { verify } from "crypto"
-import { Auth } from "../types/authType"
-import { getInfoData } from "../utils/getInfoData"
-import { CreateKey } from "../utils/createKey"
 import {
   AuthFailureError,
   BadRequestError,
   ForbiddenError,
 } from "../core/error.response"
+import { AppDataSource } from "../data-source"
+import { User } from "../entity/user.entity"
+import { Auth } from "../types/authType"
+import { creatTokenPair } from "../utils/auth"
+import { CreateKey } from "../utils/createKey"
+import { getInfoData } from "../utils/getInfoData"
 import {
   findByEmail,
   findByRefreshToken,
@@ -111,7 +110,6 @@ class AuthService {
       { userID: newUser.userID, email: email, username: userName },
       key.privateKey
     )
-    console.log(tokens)
     if (tokens) {
       newUser.refreshToken = tokens.refreshToken
       await currentUser.save(newUser)

@@ -20,3 +20,8 @@ export const removeKeyById = async (userID: string) => {
     .where("userID = :id", { id: userID })
     .execute()
 }
+
+export const sortId =(id1: string, id2: string): string[] => {
+  const sortedStrings = [id1, id2].sort((a, b) => a.localeCompare(b));
+  return sortedStrings;
+}
