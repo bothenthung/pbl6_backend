@@ -125,10 +125,7 @@ class ProjectController {
     }).send(res, {})
   }
 
-  getListUser = async (
-    req: Request,
-    res: Response,
-  ) => {
+  getListUser = async (req: Request,res: Response) => {
 
     const paginationInfo: IQueryOptions = {
       orderType: 'DESC',

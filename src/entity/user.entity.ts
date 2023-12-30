@@ -1,4 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import { InvitationEntity } from "./invitation.entity"
 import { MessageEntity } from "./message.entity"
 import { Task } from "./task.entity"
 import { UserProject } from "./userProject.entity"
@@ -30,7 +31,13 @@ export class User {
   sendMessages: MessageEntity[]  
   
   @OneToMany(() => MessageEntity , (message) => message.userReceive)
-  receiveMessages: MessageEntity[]  
+  receiveMessages: MessageEntity[] 
+  
+  @OneToMany(() => InvitationEntity , (invitation) => invitation.userSend)
+  sendInvitations: InvitationEntity[]  
+  
+  @OneToMany(() => InvitationEntity , (invitation) => invitation.userReceive)
+  receiveInvitations: InvitationEntity[]
 
   @OneToMany(() => UserProject , (userProject) => userProject.user)
   userProjects: UserProject[]  

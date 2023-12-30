@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-const auth_1 = require("../utils/auth");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const error_response_1 = require("../core/error.response");
 const data_source_1 = require("../data-source");
 const user_entity_1 = require("../entity/user.entity");
-const bcrypt_1 = __importDefault(require("bcrypt"));
-const getInfoData_1 = require("../utils/getInfoData");
+const auth_1 = require("../utils/auth");
 const createKey_1 = require("../utils/createKey");
-const error_response_1 = require("../core/error.response");
+const getInfoData_1 = require("../utils/getInfoData");
 const user_utils_1 = require("../utils/user.utils");
 class AuthService {
 }
@@ -96,7 +96,6 @@ AuthService.signup = ({ userName, email, password }) => __awaiter(void 0, void 0
         publicKey: publicKeyString,
     });
     const tokens = yield (0, auth_1.creatTokenPair)({ userID: newUser.userID, email: email, username: userName }, key.privateKey);
-    console.log(tokens);
     if (tokens) {
         newUser.refreshToken = tokens.refreshToken;
         yield currentUser.save(newUser);

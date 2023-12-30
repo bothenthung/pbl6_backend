@@ -1,9 +1,11 @@
+import { Request } from "express"
 import { ErrorResponse } from "../core/error.response"
 import { AppDataSource } from "../data-source"
 import { User } from "../entity/user.entity"
 import { UserProject } from "../entity/userProject.entity"
 import { getInfoData } from "../utils/getInfoData"
 import { IQueryOptions, pagination } from "../utils/pagination"
+
 
 class UserService {
   getUserByUserName = async (username: string, userId: string) => {
@@ -19,6 +21,26 @@ class UserService {
         dataObject: user,
       }),
     }
+  }
+
+  getAllUserPagination = async (req: Request , paginationInfo: IQueryOptions) => {
+    
+    let entity = AppDataSource.getRepository(User)
+        .createQueryBuilder('user')
+        .where(`user.email LIKE '%${req.query.email}%'`)
+    
+    if(req.query.outSideProject) {
+      entity = entity.leftJoin('user.userProjects', 'userProject', 'userProject.projectID = :projectId', {
+        projectId: req.query.projectID,
+      })
+      .where('userProject.projectID IS NULL OR userProject.projectID <> :projectId', {
+        projectId: req.query.projectID,
+      })
+    }
+
+    const users = pagination(entity, paginationInfo);
+    
+    return users;
   }
 
   updateUserByID = async (userupdate: any, userID: string) => {
@@ -37,6 +59,17 @@ class UserService {
         dataObject: currentuser,
       }),
     }
+  }
+
+  verifyEmail = async (req: Request) => {
+    const { email = []} = req.body;
+    const users = await AppDataSource.getRepository(User)
+    .createQueryBuilder('user')
+    .where(`email in (${email.map((x: string) => `'${x}'`).join(', ')})`)
+    .getMany()
+
+    
+    return users;
   }
 
   // deleteUserByID = async (userID: string) => {

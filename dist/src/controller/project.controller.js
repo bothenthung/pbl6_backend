@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const success_reponse_1 = require("../core/success.reponse");
 const project_service_1 = __importDefault(require("../service/project.service"));
+const user_service_1 = __importDefault(require("../service/user.service"));
 class ProjectController {
     constructor() {
         this.addProject = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
@@ -96,6 +97,18 @@ class ProjectController {
             new success_reponse_1.SuccessResponse({
                 message: "Delete task success.",
                 metadata: yield project_service_1.default.deleteTaskByTaskID(req, taskID),
+            }).send(res, {});
+        });
+        this.getListUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const paginationInfo = {
+                orderType: 'DESC',
+                orderBy: 'user.userName',
+                page: req.query.page ? +req.query.page : -1,
+                itemsPerPage: req.query.itemsPerPage ? +req.query.itemsPerPage : 10
+            };
+            new success_reponse_1.SuccessResponse({
+                message: "Get user success!",
+                metadata: yield user_service_1.default.getListUserByProjectID(req, paginationInfo),
             }).send(res, {});
         });
     }

@@ -9,6 +9,12 @@ userRouter.patch(
   "/updateuser",
   asyncHandler(userController.updateUserByID) as any
 )
+
+userRouter.get("/", asyncHandler(userController.getAllUser) as any)
+
+userRouter.post("/verify-email", asyncHandler(userController.verifyEmail) as any)
+
+
 // userRouter.delete(
 //   "/deleteuser",
 //   asyncHandler(userController.deleteUserByID) as any

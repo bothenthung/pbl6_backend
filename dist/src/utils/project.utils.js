@@ -13,15 +13,14 @@ exports.CheckProjectExists = exports.checkUserInProject = void 0;
 const error_response_1 = require("../core/error.response");
 const data_source_1 = require("../data-source");
 const project_entity_1 = require("../entity/project.entity");
+const userProject_entity_1 = require("../entity/userProject.entity");
 const checkUserInProject = (projectID, userID) => __awaiter(void 0, void 0, void 0, function* () {
-    const currentUser = yield data_source_1.AppDataSource.getRepository(project_entity_1.Project)
-        .createQueryBuilder("project")
-        .leftJoinAndSelect("project.users", "user")
-        .where("project.projectID = :projectID", { projectID: projectID })
-        .andWhere("user.userID = :userID", { userID: userID })
+    const userProjectRepository = data_source_1.AppDataSource.getRepository(userProject_entity_1.UserProject);
+    const userInProject = yield userProjectRepository
+        .createQueryBuilder("userProject")
+        .where("userProject.userID = :userID AND userProject.projectID = :projectID", { userID, projectID })
         .getOne();
-    const isUserInProject = Boolean(currentUser);
-    return isUserInProject;
+    return !!userInProject;
 });
 exports.checkUserInProject = checkUserInProject;
 const CheckProjectExists = (projectID) => __awaiter(void 0, void 0, void 0, function* () {
