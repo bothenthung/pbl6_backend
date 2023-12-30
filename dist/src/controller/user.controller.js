@@ -27,6 +27,24 @@ UserController.getUserByID = (req, res, next) => __awaiter(void 0, void 0, void 
         metadata: yield user_service_1.default.getUserByUserName(username, userIdString),
     }).send(res, {});
 });
+UserController.getAllUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const paginationInfo = {
+        orderType: 'DESC',
+        orderBy: 'user.email',
+        page: req.query.page ? +req.query.page : -1,
+        itemsPerPage: req.query.itemsPerPage ? +req.query.itemsPerPage : 10,
+    };
+    new success_reponse_1.SuccessResponse({
+        message: "Get user success!",
+        metadata: yield user_service_1.default.getAllUserPagination(req, paginationInfo),
+    }).send(res, {});
+});
+UserController.verifyEmail = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    new success_reponse_1.SuccessResponse({
+        message: "Get user success!",
+        metadata: yield user_service_1.default.verifyEmail(req),
+    }).send(res, {});
+});
 UserController.updateUserByID = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userIdString = (0, auth_1.getUserIDString)(req);
     new success_reponse_1.SuccessResponse({

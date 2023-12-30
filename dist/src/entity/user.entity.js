@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
+const invitation_entity_1 = require("./invitation.entity");
 const message_entity_1 = require("./message.entity");
 const task_entity_1 = require("./task.entity");
 const userProject_entity_1 = require("./userProject.entity");
@@ -53,6 +54,14 @@ __decorate([
     (0, typeorm_1.OneToMany)(() => message_entity_1.MessageEntity, (message) => message.userReceive),
     __metadata("design:type", Array)
 ], User.prototype, "receiveMessages", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => invitation_entity_1.InvitationEntity, (invitation) => invitation.userSend),
+    __metadata("design:type", Array)
+], User.prototype, "sendInvitations", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => invitation_entity_1.InvitationEntity, (invitation) => invitation.userReceive),
+    __metadata("design:type", Array)
+], User.prototype, "receiveInvitations", void 0);
 __decorate([
     (0, typeorm_1.OneToMany)(() => userProject_entity_1.UserProject, (userProject) => userProject.user),
     __metadata("design:type", Array)

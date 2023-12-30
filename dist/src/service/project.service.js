@@ -10,32 +10,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-const data_source_1 = require("../data-source");
-const user_entity_1 = require("../entity/user.entity");
-const project_entity_1 = require("../entity/project.entity");
 const error_response_1 = require("../core/error.response");
+const data_source_1 = require("../data-source");
 const column_entity_1 = require("../entity/column.entity");
-const project_utils_1 = require("../utils/project.utils");
+const project_entity_1 = require("../entity/project.entity");
 const task_entity_1 = require("../entity/task.entity");
+const user_entity_1 = require("../entity/user.entity");
+const userProject_entity_1 = require("../entity/userProject.entity");
+const project_utils_1 = require("../utils/project.utils");
 class ProjectService {
 }
 _a = ProjectService;
 ProjectService.addProject = (user, project) => __awaiter(void 0, void 0, void 0, function* () {
     const projectRepository = data_source_1.AppDataSource.getRepository(project_entity_1.Project);
+    const userProjectRepository = data_source_1.AppDataSource.getRepository(userProject_entity_1.UserProject);
     const newProject = projectRepository.create({
         title: project.title,
         users: [user],
     });
-    const saveProject = yield projectRepository.save(newProject);
-    const projectCreated = {
-        projectID: saveProject.projectID,
-        title: saveProject.title,
-        created_at: saveProject.created_at,
-    };
-    if (!projectCreated) {
-        throw new error_response_1.BadRequestError("Project not created!");
-    }
-    return projectCreated;
+    const savedProject = yield projectRepository.save(newProject);
+    const userProject = userProjectRepository.create({
+        userID: user.userID,
+        projectID: savedProject.projectID,
+    });
+    yield userProjectRepository.save(userProject);
+    return savedProject;
 });
 ProjectService.deletePoject = (projectID, userID) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield (0, project_utils_1.checkUserInProject)(projectID, userID);
@@ -59,7 +58,8 @@ ProjectService.getAllProjectByUserID = (user) => __awaiter(void 0, void 0, void 
         "project.description",
         "project.created_at",
     ])
-        .leftJoin("project.users", "user")
+        .innerJoin(userProject_entity_1.UserProject, "userProject", "userProject.projectID = project.projectID")
+        .innerJoin(user_entity_1.User, "user", "user.userID = userProject.userID")
         .where("user.userID = :userID", { userID: user.userID })
         .getMany();
     if (!projects) {
@@ -109,36 +109,40 @@ ProjectService.getProjectDetails = (userID, req) => __awaiter(void 0, void 0, vo
 });
 ProjectService.addUserToProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { projectID, email } = req.body;
-    const projectRepository = data_source_1.AppDataSource.getRepository(project_entity_1.Project);
     const userRepository = data_source_1.AppDataSource.getRepository(user_entity_1.User);
+    const projectRepository = data_source_1.AppDataSource.getRepository(project_entity_1.Project);
+    const userProjectRepository = data_source_1.AppDataSource.getRepository(userProject_entity_1.UserProject);
     const project = yield projectRepository.findOneBy({
         projectID: projectID,
     });
-    if (!project) {
+    if (!project)
         throw new error_response_1.BadRequestError("Project not found!");
-    }
-    const users = yield userRepository.findOneBy({ email: email });
-    if (!users) {
+    const user = yield userRepository.findOneBy({ email: email });
+    if (!user)
         throw new error_response_1.BadRequestError("User is not registered!");
-    }
-    project.users.push(users);
-    yield projectRepository.save(project);
-    const updatedProject = yield projectRepository
-        .createQueryBuilder("project")
-        .leftJoinAndSelect("project.users", "user")
-        .select([
-        "project.projectID",
-        "project.title",
-        "user.userID",
-        "user.userName",
-        "user.email",
-    ])
-        .where("project.projectID = :projectID", { projectID })
-        .getOne();
-    if (!updatedProject) {
-        throw new error_response_1.BadRequestError("Error getting user list after adding!");
-    }
-    return updatedProject;
+    const userProject = userProjectRepository.create({
+        userID: user.userID,
+        projectID: project.projectID,
+    });
+    const addedUserToProject = yield userProjectRepository.save(userProject);
+    return addedUserToProject;
+    // project.users.push(users)
+    // await projectRepository.save(project)
+    // const updatedProject = await projectRepository
+    //   .createQueryBuilder("project")
+    //   .leftJoinAndSelect("project.users", "user")
+    //   .select([
+    //     "project.projectID",
+    //     "project.title",
+    //     "user.userID",
+    //     "user.userName",
+    //     "user.email",
+    //   ])
+    //   .where("project.projectID = :projectID", { projectID })
+    //   .getOne()
+    // if (!updatedProject) {
+    //   throw new BadRequestError("Error getting user list after adding!")
+    // }
 });
 ProjectService.addColumnToProject = (reqBody) => __awaiter(void 0, void 0, void 0, function* () {
     const columnRepository = data_source_1.AppDataSource.getRepository(column_entity_1.Columns);
@@ -188,7 +192,6 @@ ProjectService.getAllColumn = (projectID) => __awaiter(void 0, void 0, void 0, f
 });
 ProjectService.deleteColumn = (req, columnID) => __awaiter(void 0, void 0, void 0, function* () {
     const projectID = req.body.projectID;
-    console.log(columnID);
     const user = yield (0, project_utils_1.checkUserInProject)(req.body.projectID, req.user.userID);
     if (!user) {
         throw new error_response_1.BadRequestError("User does not belong to project!");
@@ -383,7 +386,6 @@ ProjectService.changeIndexTask = (req) => __awaiter(void 0, void 0, void 0, func
 });
 ProjectService.getAllTask = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const { columnID } = req.body;
-    const userID = req.user.userID;
     const column = yield data_source_1.AppDataSource.getRepository(column_entity_1.Columns)
         .createQueryBuilder("columns")
         .leftJoinAndSelect("columns.tasks", "task")

@@ -23,3 +23,4 @@ exports.projectRouter.post("/task/getAll", (0, asyncHandler_1.asyncHandler)(proj
 exports.projectRouter.post("/task/changeindex", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.changeIndexTask));
 exports.projectRouter.delete("/task/delete/:taskID", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.deleteTaskByTaskID));
 exports.projectRouter.get("/messages", (0, asyncHandler_1.asyncHandler)(message_controller_1.default.getListMessage));
+exports.projectRouter.get("/users", (0, asyncHandler_1.asyncHandler)(project_controller_1.default.getListUser));

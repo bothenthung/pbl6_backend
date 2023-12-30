@@ -5,6 +5,7 @@ import { Project } from "./entity/project.entity"
 import { Task } from "./entity/task.entity"
 import { User } from "./entity/user.entity"
 import { UserProject } from "./entity/userProject.entity"
+import { InvitationEntity } from "./entity/invitation.entity"
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
   password: "Abc123@@",
   database: "pbl6_final",
   logging: true,
-  entities: [User, Project, Columns, Task, MessageEntity , UserProject],
+  entities: [User, Project, Columns, Task, MessageEntity , UserProject , InvitationEntity],
   migrationsRun: true,
   migrations: ["dist/src/migrations/*{.ts,.js}"],
 })

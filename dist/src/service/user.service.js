@@ -12,7 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const error_response_1 = require("../core/error.response");
 const data_source_1 = require("../data-source");
 const user_entity_1 = require("../entity/user.entity");
+const userProject_entity_1 = require("../entity/userProject.entity");
 const getInfoData_1 = require("../utils/getInfoData");
+const pagination_1 = require("../utils/pagination");
 class UserService {
     constructor() {
         this.getUserByUserName = (username, userId) => __awaiter(this, void 0, void 0, function* () {
@@ -28,6 +30,14 @@ class UserService {
                     dataObject: user,
                 }),
             };
+        });
+        this.getAllUserPagination = (req, paginationInfo) => __awaiter(this, void 0, void 0, function* () {
+            console.log("hehehehehe", req.query.email);
+            const entity = yield data_source_1.AppDataSource.getRepository(user_entity_1.User)
+                .createQueryBuilder('user')
+                .where(`user.email LIKE '%${req.query.email}%'`);
+            const users = (0, pagination_1.pagination)(entity, paginationInfo);
+            return users;
         });
         this.updateUserByID = (userupdate, userID) => __awaiter(this, void 0, void 0, function* () {
             const user = yield data_source_1.AppDataSource.createQueryBuilder(user_entity_1.User, "user")
@@ -45,6 +55,14 @@ class UserService {
                 }),
             };
         });
+        this.verifyEmail = (req) => __awaiter(this, void 0, void 0, function* () {
+            const { email = [] } = req.body;
+            const users = yield data_source_1.AppDataSource.getRepository(user_entity_1.User)
+                .createQueryBuilder('user')
+                .where(`email in (${email.map((x) => `'${x}'`).join(', ')})`)
+                .getMany();
+            return users;
+        });
         // deleteUserByID = async (userID: string) => {
         //   await AppDataSource.createQueryBuilder(User, "user")
         //     .delete()
@@ -52,6 +70,16 @@ class UserService {
         //     .execute()
         //   return {}
         // }
+        this.getListUserByProjectID = (req, paginationInfo) => __awaiter(this, void 0, void 0, function* () {
+            const userRepository = data_source_1.AppDataSource.getRepository(user_entity_1.User);
+            const entity = yield userRepository
+                .createQueryBuilder("user")
+                .innerJoin(userProject_entity_1.UserProject, "userProject", "userProject.userID = user.userID")
+                .where("userProject.projectID = :projectID", { projectID: req.query.projectID })
+                .andWhere("user.userID <> :excludeUserID", { excludeUserID: req.user.userID });
+            const users = (0, pagination_1.pagination)(entity, paginationInfo);
+            return users;
+        });
     }
 }
 exports.default = new UserService();

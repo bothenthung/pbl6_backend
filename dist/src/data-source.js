@@ -8,6 +8,7 @@ const project_entity_1 = require("./entity/project.entity");
 const task_entity_1 = require("./entity/task.entity");
 const user_entity_1 = require("./entity/user.entity");
 const userProject_entity_1 = require("./entity/userProject.entity");
+const invitation_entity_1 = require("./entity/invitation.entity");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: "mysql",
     host: "127.0.0.1",
@@ -16,7 +17,7 @@ exports.AppDataSource = new typeorm_1.DataSource({
     password: "Abc123@@",
     database: "pbl6_final",
     logging: true,
-    entities: [user_entity_1.User, project_entity_1.Project, column_entity_1.Columns, task_entity_1.Task, message_entity_1.MessageEntity, userProject_entity_1.UserProject],
+    entities: [user_entity_1.User, project_entity_1.Project, column_entity_1.Columns, task_entity_1.Task, message_entity_1.MessageEntity, userProject_entity_1.UserProject, invitation_entity_1.InvitationEntity],
     migrationsRun: true,
     migrations: ["dist/src/migrations/*{.ts,.js}"],
 });

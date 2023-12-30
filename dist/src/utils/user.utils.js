@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeKeyById = exports.findByRefreshToken = exports.findById = exports.findByEmail = void 0;
+exports.sortId = exports.removeKeyById = exports.findByRefreshToken = exports.findById = exports.findByEmail = void 0;
 const data_source_1 = require("../data-source");
 const user_entity_1 = require("../entity/user.entity");
 const findByEmail = ({ email }) => __awaiter(void 0, void 0, void 0, function* () {
@@ -32,3 +32,8 @@ const removeKeyById = (userID) => __awaiter(void 0, void 0, void 0, function* ()
         .execute();
 });
 exports.removeKeyById = removeKeyById;
+const sortId = (id1, id2) => {
+    const sortedStrings = [id1, id2].sort((a, b) => a.localeCompare(b));
+    return sortedStrings;
+};
+exports.sortId = sortId;
