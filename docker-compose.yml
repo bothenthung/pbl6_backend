@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Abc123@@
+      MYSQL_DATABASE: pbl6_final
+    ports:
+      - 3306:3306
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/db/conf.d:/etc/mysql/conf.d
+
+  pbl6-app:
+    container_name: pbl6-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3009:3009
+    depends_on:
+      - db
+    links:
+      - db
+
+volumes:
+  db_data: 
+
+

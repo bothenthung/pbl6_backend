@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon --exec ts-node server.ts",
+    "deploy": "nodemon --exec ts-node server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "npx tsc && npx typeorm -d dist/src/data-source.js",
     "migration:generate": "npm run typeorm migration:generate",
@@ -29,6 +30,7 @@
     "lodash": "^4.17.21",
     "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
+    "mysql2": "^3.6.5",
     "socket.io": "^4.5.4",
     "typeorm": "^0.3.17"
   },
