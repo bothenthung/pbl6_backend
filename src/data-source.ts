@@ -11,8 +11,8 @@ import serverConfig from "./core/config";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
-  host: "127.0.0.1",
-  port: 3306,
+  host: serverConfig.dbHost,
+  port: serverConfig.dbPort,
   username: serverConfig.dbUser,
   password: serverConfig.dbPassword,
   database: serverConfig.dbName,

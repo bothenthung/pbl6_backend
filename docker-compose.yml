@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   db:
@@ -15,18 +15,15 @@ services:
       - ./docker/db/conf.d:/etc/mysql/conf.d
 
   pbl6-app:
-    container_name: pbl6-app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
       - 3009:3009
     depends_on:
       - db
     links:
       - db
+    env_file:
+      - .env
 
 volumes:
-  db_data: 
-
-
+  db_data:
