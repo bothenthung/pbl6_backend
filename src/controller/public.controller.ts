@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express"
-import { SuccessResponse } from "../core/success.reponse"
 import PublicService from "../service/public.service"
 
 class PublicController {

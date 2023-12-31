@@ -1,5 +1,6 @@
 import crypto from "crypto"
 
+/** @deprecated */
 export const CreateKey = async () => {
   const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
     modulusLength: 4096,

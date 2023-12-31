@@ -8,7 +8,6 @@ import {
 } from "../core/error.response"
 import { findById } from "../utils/user.utils"
 
-interface IPayload<T extends any = object> {}
 interface JwtPayload {
   userID: string
 }
@@ -27,15 +26,13 @@ export const HEADER = {
   AUTHORIZATION: "authorization",
 }
 
-export const creatTokenPair = async (payload: IPayload, privateKey: string) => {
+export const creatTokenPair = async <T extends object = object>(payload: Partial<T>, privateKey: string) => {
   try {
-    const accessToken = await JWT.sign(payload, privateKey, {
-      algorithm: "RS256",
+    const accessToken = JWT.sign(payload, privateKey, {
       expiresIn: "2 days",
     })
 
-    const refreshToken = await JWT.sign(payload, privateKey, {
-      algorithm: "RS256",
+    const refreshToken = JWT.sign(payload, privateKey, {
       expiresIn: "7 days",
     })
 
@@ -45,6 +42,7 @@ export const creatTokenPair = async (payload: IPayload, privateKey: string) => {
   }
 }
 
+/** @deprecated */
 export const authentication = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const userIdString = getUserIDString(req)
@@ -91,6 +89,7 @@ export const receiveRefreshToken = asyncHandler(
   }
 )
 
+/** @deprecated */
 export const getUserIDString = (req: Request) => {
   const userIdString = req.headers[HEADER.CLIENT_KEY]?.toString()
   if (!userIdString) throw new ErrorResponse("userID not found", 400)

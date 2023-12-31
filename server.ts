@@ -3,6 +3,8 @@ import httpsServer from "./src/app"
 // const PORT = process.env.PORT
 const PORT = 3009
 
+console.log(process.env.TZ)
+
 httpsServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 })

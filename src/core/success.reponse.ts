@@ -16,6 +16,7 @@ export class SuccessResponse {
   status: number
   metadata: object
   reasonStatusCode: string
+
   constructor({
     message = "",
     status = StatusCode.OK,
@@ -26,7 +27,7 @@ export class SuccessResponse {
     this.status = status
     this.metadata = metadata
   }
-  send(res: Response, header: {}) {
+  send(res: Response, header?: {}) {
     return res.status(this.status).json(this)
   }
 }

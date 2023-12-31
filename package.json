@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": " nodemon --exec ts-node server.ts",
+    "start": "nodemon --exec ts-node server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "typeorm": "npx tsc && npx typeorm -d dist/src/data-source.js",
     "migration:generate": "npm run typeorm migration:generate",
