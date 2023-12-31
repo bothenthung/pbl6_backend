@@ -1,16 +1,17 @@
 import compression from "compression"
 import cors from "cors"
-import env, * as dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
 import express, { ErrorRequestHandler } from "express"
 import helmet from "helmet"
 import http from 'http'
 import morgan from "morgan"
 import socketio from 'socket.io'
 import { AppDataSource } from "./data-source"
-import { routes } from "./routes"
 import { socketServices } from "./service/socket.service"
+import routes from "./routes";
+import authentication from "./middlewares/authentication";
 
-dotenv.config({ path: __dirname + "/.env" })
+dotenv.config()
 const app = express()
 
 app.use(helmet())
@@ -27,6 +28,7 @@ AppDataSource.initialize()
     console.log("Loi ket noi database", error)
   })
 
+app.all("*", authentication)
 app.use("/", routes)
 
 const errorHandler: ErrorRequestHandler = (error, req, res, next) => {

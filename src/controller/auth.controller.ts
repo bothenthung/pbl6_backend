@@ -1,8 +1,10 @@
-import { NextFunction, Request, Response } from "express"
-import authService from "../service/auth.service"
-import { OK, CREATED, SuccessResponse } from "../core/success.reponse"
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import authService from "../service/auth.service";
+import { OK, CREATED, SuccessResponse } from "../core/success.reponse";
+import { catchAsync } from "../utils/asyncHandler";
 
 class AuthController {
+  /** @deprecated */
   handleRefreshToken = async (
     req: Request,
     res: Response,
@@ -11,29 +13,34 @@ class AuthController {
     new SuccessResponse({
       message: "Refresh Token success ",
       metadata: await authService.handlerRefreshToken(req.refreshToken),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
-  logout = async (req: Request, res: Response, next: NextFunction) => {
-    new SuccessResponse({
-      message: "logout success ",
-      metadata: await authService.logout(req.user),
-    }).send(res, {})
-  }
+  signup = catchAsync(async (req, res) => {
+    const metadata = await authService.signup(req.body)
 
-  signup = async (req: Request, res: Response, next: NextFunction) => {
     new CREATED({
       message: "User created successfully",
-      metadata: await authService.signup(req.body),
-    }).send(res, {})
-  }
+      metadata,
+    }).send(res);
+  });
 
-  login = async (req: Request, res: Response, next: NextFunction) => {
+  login = catchAsync(async (req, res) => {
+    const metadata = await authService.login(req.body)
     new OK({
       message: "Login success!",
-      metadata: await authService.login(req.body),
-    }).send(res, {})
-  }
+      metadata,
+    }).send(res);
+  });
+
+  logout = catchAsync(async (req, res) => {
+    const metadata = await authService.logout(req.user)
+
+    new SuccessResponse({
+      message: "logout success ",
+      metadata,
+    }).send(res);
+  });
 }
 
-export default new AuthController()
+export default new AuthController();

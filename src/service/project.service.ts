@@ -9,6 +9,10 @@ import { UserProject } from "../entity/userProject.entity"
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils"
 
 class ProjectService {
+  static create = async () => {
+    return undefined
+  }
+
   static addProject = async (user: any, project: any) => {
     const projectRepository = AppDataSource.getRepository(Project);
     const userProjectRepository = AppDataSource.getRepository(UserProject);

@@ -1,10 +1,20 @@
-import { NextFunction, Request, Response } from "express"
-import { SuccessResponse } from "../core/success.reponse"
+import { NextFunction, Request, RequestHandler, Response } from "express"
+import { CREATED, SuccessResponse } from "../core/success.reponse"
 import ProjectService from "../service/project.service"
 import userService from "../service/user.service"
 import { IQueryOptions } from "../utils/pagination"
+import { ParamsDictionary } from "express-serve-static-core";
+import { ParsedQs } from "qs";
+import { catchAsync } from "../utils/asyncHandler";
 
 class ProjectController {
+  create = catchAsync(async (req, res) => {
+    new CREATED({
+      message: "Create project success.",
+      metadata: await ProjectService.create()
+    }).send(res)
+  })
+
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Create project success.",

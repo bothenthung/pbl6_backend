@@ -1,9 +1,12 @@
-import express, { Router } from "express"
-import { asyncHandler } from "../../utils/asyncHandler"
+import express from "express"
+import { asyncHandler, catchAsync } from "../../utils/asyncHandler"
 import projectController from "../../controller/project.controller"
 import MessageController from "../../controller/message.controller"
 
-export const projectRouter: Router = express.Router()
+export const projectRouter = express.Router()
+
+projectRouter.post("/", projectController.create)
+
 projectRouter.post("/add", asyncHandler(projectController.addProject) as any)
 projectRouter.post(
   "/getall",
