@@ -32,5 +32,9 @@ export interface IInvitationUpdateReq {
 
 export interface IColumnCreateReq {
   title: string;
+}
+
+export interface IColumnUpdateReq {
+  title: string;
   index: number;
 }

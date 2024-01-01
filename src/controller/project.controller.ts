@@ -63,6 +63,13 @@ class ProjectController {
       metadata: await this.service.getAllColumns(req.params),
     }).send(res);
   })
+  
+  updateColumn = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Update column success.",
+      metadata: await this.service.updateColumn(req.params, req.body),
+    }).send(res);
+  })
 
   /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {

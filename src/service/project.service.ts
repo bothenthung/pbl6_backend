@@ -8,13 +8,13 @@ import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
 import { UserEntity } from "../entities/User.entity";
-import { IColumnCreateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
+import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
 import { ProjectEntity } from "../entities/Project.entity";
 import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
 import QueryString from "qs";
 import { parseQuery } from "../utils/pagination";
-import { Not } from "typeorm";
+import { Between, IsNull, MoreThan, Not } from "typeorm";
 import { ColumnEntity } from "../entities/Column.entity";
 
 class ProjectService {
@@ -184,9 +184,93 @@ class ProjectService {
 
     if (!project) throw new NotFoundError();
 
-    const columns = await ColumnEntity.findBy({ projectId: project.id });
+    const columns = await ColumnEntity.find({
+      where: {
+        projectId: project.id
+      },
+      order: {
+        index: "ASC"
+      },
+      withDeleted: false
+    });
 
     return columns;
+  }
+
+  async updateColumn(params: QueryString.ParsedQs, body: IColumnUpdateReq) {
+    if (!params.projectId || !params.columnId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+    const column = await ColumnEntity.findOneBy({ id: params.columnId as string });
+
+    if (!project || !column) throw new NotFoundError();
+
+
+
+    if (body.index > column.index) {
+      let indexes: number[] = [];
+      const columnsChange = await ColumnEntity.find({
+        where: {
+          projectId: project.id,
+          index: Between(column.index, body.index)
+        },
+        order: {
+          index: "asc"
+        },
+        withDeleted: false
+      });
+
+      for (let i = 0; i < columnsChange.length; i++) {
+        if (i === 0) {
+          indexes[i] = columnsChange[columnsChange.length - 1].index;
+        } else {
+          indexes[i] = columnsChange[i].index - 1;
+        }
+      }
+
+      Promise.all(columnsChange.map((record, index) => {
+        record.index = indexes[index];
+
+        if (index === 0) {
+          record.title = body.title;
+        }
+        return record.save();
+      }));
+    } else if (body.index < column.index) {
+      let indexes: number[] = [];
+      const columnsChange = await ColumnEntity.find({
+        where: {
+          projectId: project.id,
+          index: Between(body.index, column.index)
+        },
+        order: {
+          index: "asc"
+        },
+        withDeleted: false
+      });
+
+      for (let i = 0; i < columnsChange.length; i++) {
+        if (i === columnsChange.length - 1) {
+          indexes[i] = columnsChange[0].index;
+        } else {
+          indexes[i] = columnsChange[i].index + 1;
+        }
+      }
+
+      Promise.all(columnsChange.map((record, index) => {
+        record.index = indexes[index];
+        if (index === columnsChange.length - 1) {
+          record.title = body.title;
+        }
+        return record.save();
+      }));
+    } else {
+      column.title = body.title;
+
+      await column.save();
+    }
+
+    return undefined;
   }
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {
