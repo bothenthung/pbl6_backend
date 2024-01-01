@@ -15,7 +15,7 @@ export class ProjectEntity extends BaseAttributes {
   title: string
 
   @Column({ type: "text", nullable: true })
-  description: string
+  description?: string
 
   @ManyToMany(type => UserEntity, user => user.projects)
   users: UserEntity[]

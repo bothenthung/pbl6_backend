@@ -7,9 +7,23 @@ import { Task } from "../entity/task.entity"
 import { User } from "../entity/user.entity"
 import { UserProject } from "../entity/userProject.entity"
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils"
+import { UserEntity } from "../entities/User.entity";
+import { IProjectCreateReq } from "../dto/project.request.dto";
+import { ProjectEntity } from "../entities/Project.entity";
+import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 
 class ProjectService {
-  static create = async () => {
+  static create = async (owner: UserEntity, body: IProjectCreateReq) => {
+    const newProject = new ProjectEntity();
+
+    const newOwner = new ProjectUserEntity();
+
+    
+
+    newProject.title = body.title;
+    newProject.description = body.description;
+    newProject.roles = []
+    
     return undefined
   }
 

@@ -16,8 +16,8 @@ export class ProjectUserEntity extends BaseAttributes {
   @Column({ name: "project_id", type: "uuid", nullable: false })
   projectId: string;
 
-  @Column({ name: "owner_id", type: "uuid", nullable: false })
-  ownerId: string;
+  @Column({ name: "user_id", type: "uuid", nullable: false })
+  userId: string;
 
   @Column({ type: "enum", enum: EProjectRole, default: EProjectRole.GUEST })
   role: EProjectRole;

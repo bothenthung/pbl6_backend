@@ -11,7 +11,7 @@ import { UserEntity } from "./entities/User.entity";
 export const AppDataSource = new DataSource({
   type: "mysql",
   host: serverConfig.dbHost,
-  port: serverConfig.dbPort,
+  port: +serverConfig.dbPort,
   username: serverConfig.dbUser,
   password: serverConfig.dbPassword,
   database: serverConfig.dbName,

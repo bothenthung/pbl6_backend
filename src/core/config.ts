@@ -8,7 +8,7 @@ const serverConfig = {
   dbUser: process.env.DB_USER as string,
   dbPassword: process.env.DB_PASSWORD as string,
   dbHost: process.env.DB_HOST as string,
-  dbPort: (process.env.DB_PORT || 3306) as number,
+  dbPort: process.env.DB_PORT || 3306,
 }
 
 export default serverConfig;

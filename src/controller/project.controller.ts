@@ -11,7 +11,7 @@ class ProjectController {
   create = catchAsync(async (req, res) => {
     new CREATED({
       message: "Create project success.",
-      metadata: await ProjectService.create()
+      metadata: await ProjectService.create(req.user, req.body)
     }).send(res)
   })
 
