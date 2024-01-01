@@ -1,11 +1,9 @@
 import {
   Column,
   Entity,
-  ManyToMany,
   OneToMany,
 } from "typeorm";
 import { BaseAttributes } from "./attributes/BaseAttributes";
-import { UserEntity } from "./User.entity";
 import { ProjectUserEntity } from "./ProjectUser.entity";
 import { ColumnEntity } from "./Column.entity";
 

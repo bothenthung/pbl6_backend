@@ -50,6 +50,20 @@ class ProjectController {
     }).send(res);
   })
 
+  createColumn = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Create column success.",
+      metadata: await this.service.createColumn(req.params, req.body),
+    }).send(res);
+  })
+
+  getAllColumns = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get all columns success.",
+      metadata: await this.service.getAllColumns(req.params),
+    }).send(res);
+  })
+
   /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({

@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany
 } from "typeorm";
@@ -20,6 +21,7 @@ export class ColumnEntity extends BaseAttributes {
   projectId: string;
 
   @ManyToOne(type => ProjectEntity, project => project.columns)
+  @JoinColumn({ name: "project_id" })
   project: ProjectEntity;
 
   @OneToMany(type => TaskEntity, task => task.column)

@@ -29,3 +29,8 @@ export interface IInvitationUpdateReq {
   invitationId: string;
   isAccept: boolean;
 }
+
+export interface IColumnCreateReq {
+  title: string;
+  index: number;
+}

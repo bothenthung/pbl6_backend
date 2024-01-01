@@ -8,13 +8,14 @@ import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
 import { UserEntity } from "../entities/User.entity";
-import { IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
+import { IColumnCreateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
 import { ProjectEntity } from "../entities/Project.entity";
 import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
 import QueryString from "qs";
 import { parseQuery } from "../utils/pagination";
 import { Not } from "typeorm";
+import { ColumnEntity } from "../entities/Column.entity";
 
 class ProjectService {
   async create(owner: UserEntity, body: IProjectCreateReq) {
@@ -139,23 +140,53 @@ class ProjectService {
     const projectUser = await ProjectUserEntity.findOneBy({
       id: body.invitationId,
       userId: user.id
-    })
+    });
 
     if (!projectUser) throw new NotFoundError();
 
     if (body.isAccept) {
       projectUser.role = projectUser.roleInvited;
       projectUser.status = EProjectInvitationStatus.ACCEPTED;
-    } 
-    
+    }
+
     if (body.isAccept === false) {
       projectUser.status = EProjectInvitationStatus.REJECT;
-      projectUser.softRemove()
+      projectUser.softRemove();
     }
 
     projectUser.save();
 
-    return undefined
+    return undefined;
+  }
+
+  async createColumn(params: QueryString.ParsedQs, body: IColumnCreateReq) {
+    if (!params.projectId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+
+    if (!project) throw new NotFoundError();
+
+    const columns = await ColumnEntity.findBy({ projectId: project.id });
+
+    const column = new ColumnEntity();
+    column.title = body.title;
+    column.index = columns.length;
+    column.project = project;
+    await column.save();
+
+    return undefined;
+  }
+
+  async getAllColumns(params: QueryString.ParsedQs) {
+    if (!params.projectId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+
+    if (!project) throw new NotFoundError();
+
+    const columns = await ColumnEntity.findBy({ projectId: project.id });
+
+    return columns;
   }
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {
