@@ -25,4 +25,11 @@ export class ProjectEntity extends BaseAttributes {
 
   @OneToMany(type => ColumnEntity, column => column.project)
   columns: ColumnEntity[]
+
+  // static getAll(id: string) {
+  //   return this.createQueryBuilder("project")
+  //     .select(["user.id", "user.userName", "user.email"])
+  //     .where("user.id = :id", { id })
+  //     .getOne();
+  // }
 }

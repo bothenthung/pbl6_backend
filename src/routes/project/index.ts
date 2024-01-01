@@ -7,6 +7,8 @@ export const projectRouter = express.Router()
 
 projectRouter.post("/", projectController.create)
 
+projectRouter.get("/", projectController.getAll)
+
 projectRouter.post("/add", asyncHandler(projectController.addProject) as any)
 projectRouter.post(
   "/getall",

@@ -22,12 +22,17 @@ export class ProjectUserEntity extends BaseAttributes {
   @Column({ type: "enum", enum: EProjectRole, default: EProjectRole.GUEST })
   role: EProjectRole;
 
-  @Column({ type: "enum", enum: EProjectInvitationStatus, default: EProjectInvitationStatus.WAITING})
+  @Column({ type: "enum", enum: EProjectRole, default: EProjectRole.USER })
+  roleInvited: EProjectRole;
+
+  @Column({ type: "enum", enum: EProjectInvitationStatus, default: EProjectInvitationStatus.WAITING })
   status: EProjectInvitationStatus;
 
   @ManyToOne(type => ProjectEntity, project => project.roles)
+  @JoinColumn({ name: "project_id" })
   project: ProjectEntity;
 
-  @ManyToOne(type => UserEntity, user => user.roles)
+  @ManyToOne(type => UserEntity, user => user.projectRoles)
+  @JoinColumn({ name: "user_id" })
   user: UserEntity;
 }

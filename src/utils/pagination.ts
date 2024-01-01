@@ -1,5 +1,51 @@
 import { ParsedQs } from 'qs';
-import { SelectQueryBuilder } from 'typeorm';
+import { BaseEntity, FindManyOptions, FindOptionsOrder, Like, SelectQueryBuilder } from 'typeorm';
+import { TSort } from '../types/dto/common';
+
+interface IPaginationQuery {
+  take: number;
+  skip: number;
+  order: {
+    [key: string]: TSort;
+  };
+}
+
+export const parsePaginationQuery = (query: ParsedQs) => {
+  const returnData: IPaginationQuery = {
+    take: 10,
+    skip: 0,
+    order: {
+      createdAt: "DESC"
+    }
+  };
+
+  if (query.limit) returnData.take = +query.limit;
+  if (query.page && query.limit) returnData.skip = (+query.page - 1) * (+query.limit);
+  if (query.orderBy) returnData.order = {
+    [query.orderBy.toString()]: (query.sort as TSort) || "DESC"
+  };
+
+  return returnData;
+};
+
+export const parseQuery = <T extends BaseEntity>(query: ParsedQs, managerQuery: FindManyOptions<T>) => {
+  const returnData: FindManyOptions<T> = {
+    ...managerQuery
+  };
+
+  if (query.limit) returnData.take = +query.limit || 10;
+  if (query.page && query.limit) returnData.skip = ((+query.page - 1) * (+query.limit)) || 0;
+  if (query.orderBy) returnData.order = {
+    [query.orderBy.toString()]: (query.sort as TSort) || "DESC"
+  } as FindOptionsOrder<T>;
+
+  if (query.searchBy && query.search) returnData.where = {
+    ...returnData.where,
+    [query.searchBy as string]: Like(`%${query.search}%`)
+  };
+
+  return returnData;
+};
 
 export interface IQueryOptions {
   orderType: 'ASC' | 'DESC';

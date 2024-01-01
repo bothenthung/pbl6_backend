@@ -10,6 +10,6 @@ export class BaseAttributes extends BaseEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   public updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn({ name: 'deleted_at', })
   public deletedAt: Date;
 }

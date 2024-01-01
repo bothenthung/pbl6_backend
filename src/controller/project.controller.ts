@@ -1,26 +1,34 @@
-import { NextFunction, Request, RequestHandler, Response } from "express"
-import { CREATED, SuccessResponse } from "../core/success.reponse"
-import ProjectService from "../service/project.service"
-import userService from "../service/user.service"
-import { IQueryOptions } from "../utils/pagination"
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import { CREATED, SuccessResponse } from "../core/success.reponse";
+import ProjectService from "../service/project.service";
+import userService from "../service/user.service.deprecated";
+import { IQueryOptions } from "../utils/pagination";
 import { catchAsync } from "../utils/asyncHandler";
+import { IProjectListReq } from "../types/dto/project.request.dto";
 
 class ProjectController {
+  service = new ProjectService();
+
   create = catchAsync(async (req, res) => {
     new CREATED({
       message: "Create project success.",
-      metadata: await ProjectService.create(req.user, req.body)
-    }).send(res)
+      metadata: await this.service.create(req.user, req.body)
+    }).send(res);
+  });
+
+  getAll = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get all project success.",
+      metadata: await this.service.getAll(req.user, req.query),
+    }).send(res);
   })
 
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Create project success.",
       metadata: await ProjectService.addProject(req.user, req.body),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   getAllProjectByUserID = async (
     req: Request,
@@ -30,16 +38,16 @@ class ProjectController {
     new SuccessResponse({
       message: "Get all project success.",
       metadata: await ProjectService.getAllProjectByUserID(req.user),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   deleteProject = async (req: Request, res: Response, next: NextFunction) => {
-    const projectID = req.params.projectID
+    const projectID = req.params.projectID;
     new SuccessResponse({
       message: "Delete project success.",
       metadata: await ProjectService.deletePoject(projectID, req.user.userID),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   getProjectDetails = async (
     req: Request,
@@ -50,8 +58,8 @@ class ProjectController {
     new SuccessResponse({
       message: "Get all project success.",
       metadata: await ProjectService.getProjectDetails(req.user.userID, req),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   addUserToProject = async (
     req: Request,
@@ -61,8 +69,8 @@ class ProjectController {
     new SuccessResponse({
       message: "Add users success.",
       metadata: await ProjectService.addUserToProject(req),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   addColumnToProject = async (
     req: Request,
@@ -72,23 +80,23 @@ class ProjectController {
     new SuccessResponse({
       message: "Add column success.",
       metadata: await ProjectService.addColumnToProject(req.body),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   getAllColumn = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Get all columns success.",
       metadata: await ProjectService.getAllColumn(req.body.projectID),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   deleteColumn = async (req: Request, res: Response, next: NextFunction) => {
-    const columnID = req.params.columnID
+    const columnID = req.params.columnID;
     new SuccessResponse({
       message: "Delete column success.",
       metadata: await ProjectService.deleteColumn(req, columnID),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   changeIndexColumn = async (
     req: Request,
@@ -98,44 +106,44 @@ class ProjectController {
     new SuccessResponse({
       message: "Change index column success.",
       metadata: await ProjectService.changeIndexColumn(req),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   addTask = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Add task success.",
       metadata: await ProjectService.addTask(req),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   getAllTask = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Get all tasks success.",
       metadata: await ProjectService.getAllTask(req),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   changeIndexTask = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Change index task success.",
       metadata: await ProjectService.changeIndexTask(req),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
   deleteTaskByTaskID = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
-    const taskID = req.params.taskID
+    const taskID = req.params.taskID;
 
     new SuccessResponse({
       message: "Delete task success.",
       metadata: await ProjectService.deleteTaskByTaskID(req, taskID),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 
-  getListUser = async (req: Request,res: Response) => {
+  getListUser = async (req: Request, res: Response) => {
 
     const paginationInfo: IQueryOptions = {
       orderType: 'DESC',
@@ -147,7 +155,7 @@ class ProjectController {
     new SuccessResponse({
       message: "Get user success!",
       metadata: await userService.getListUserByProjectID(req, paginationInfo),
-    }).send(res, {})
-  }
+    }).send(res, {});
+  };
 }
-export default new ProjectController()
+export default new ProjectController();

@@ -3,6 +3,7 @@ import { BaseAttributes } from "./attributes/BaseAttributes";
 import { ProjectEntity } from "./Project.entity";
 import { TaskEntity } from "./Task.entity";
 import { NotificationEntity } from "./Notification.entity";
+import { ProjectUserEntity } from "./ProjectUser.entity";
 
 @Entity("users")
 export class UserEntity extends BaseAttributes {
@@ -28,8 +29,8 @@ export class UserEntity extends BaseAttributes {
   @ManyToMany(type => ProjectEntity, project => project.users)
   projects: ProjectEntity[];
 
-  @OneToMany(type => UserEntity, user => user.roles)
-  roles: UserEntity[];
+  @OneToMany(type => ProjectUserEntity, projectRole => projectRole.user)
+  projectRoles: ProjectUserEntity[];
 
   /* Task */
   @OneToMany(type => TaskEntity, task => task.author)
