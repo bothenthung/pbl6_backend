@@ -18,3 +18,9 @@ export interface IProjectListReq {
   orderBy: string;
   sort: TSort;
 }
+
+export interface IProjectInviteReq {
+  projectId: string;
+  userId: string;
+  role: EProjectRole;
+}

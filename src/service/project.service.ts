@@ -8,12 +8,13 @@ import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
 import { UserEntity } from "../entities/User.entity";
-import { IProjectCreateReq, IProjectListReq, IProjectUserReq } from "../types/dto/project.request.dto";
+import { IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
 import { ProjectEntity } from "../entities/Project.entity";
 import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
 import QueryString from "qs";
-import { parsePaginationQuery, parseQuery } from "../utils/pagination";
+import { parseQuery } from "../utils/pagination";
+import { Not } from "typeorm";
 
 class ProjectService {
   async create(owner: UserEntity, body: IProjectCreateReq) {
@@ -68,11 +69,74 @@ class ProjectService {
 
   async get(user: UserEntity, params: QueryString.ParsedQs) {
     if (!params.id) throw new BadRequestError();
-    const project = await ProjectEntity.getDetailById(user.id, params.id as string)
+    const project = await ProjectEntity.getDetailById(user.id, params.id as string);
     if (!project) throw new NotFoundError();
 
     return project;
   }
+
+  async invite(user: UserEntity, body: IProjectInviteReq) {
+    const project = await ProjectEntity.findOne({
+      where: {
+        id: body.projectId,
+        roles: {
+          userId: user.id
+        }
+      },
+      withDeleted: false
+    });
+
+    const invitedUser = await UserEntity.findOneBy({ id: body.userId });
+
+    const oldProjectUsers = await ProjectUserEntity.findOne({
+      where: {
+        userId: body.userId,
+        status: Not(EProjectInvitationStatus.REJECT)
+      }
+    });
+
+    if (oldProjectUsers) return {
+      message: "user has been invited"
+    };
+
+    if (!project || !invitedUser) throw new NotFoundError();
+
+    const newProjectUser = new ProjectUserEntity();
+    newProjectUser.user = invitedUser;
+    newProjectUser.project = project;
+    newProjectUser.roleInvited = body.role;
+
+    newProjectUser.save();
+
+    return undefined;
+  }
+
+  async getAllInvitation(user: UserEntity, query: QueryString.ParsedQs) {
+    console.log("dsad>>>", user, query);
+
+    const projectUsers = await ProjectUserEntity.find(parseQuery<ProjectUserEntity>(query, {
+      where: {
+        userId: user.id
+      },
+      select: {
+        id: true,
+        roleInvited: true,
+        status: true,
+        project: {
+          id: true,
+          title: true,
+          description: true
+        },
+      },
+      relations: {
+        project: true
+      },
+      withDeleted: false
+    }));
+
+    return projectUsers;
+  }
+
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {
     const roles: ProjectUserEntity[] = [];

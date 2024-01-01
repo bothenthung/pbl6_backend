@@ -1,10 +1,9 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { CREATED, SuccessResponse } from "../core/success.reponse";
 import ProjectService from "../service/project.service";
 import userService from "../service/user.service.deprecated";
 import { IQueryOptions } from "../utils/pagination";
 import { catchAsync } from "../utils/asyncHandler";
-import { IProjectListReq } from "../types/dto/project.request.dto";
 
 class ProjectController {
   service = new ProjectService();
@@ -22,11 +21,25 @@ class ProjectController {
       metadata: await this.service.getAll(req.user, req.query),
     }).send(res);
   })
-
+  
   get = catchAsync(async (req, res) => {
     new SuccessResponse({
       message: "Get project detail success.",
       metadata: await this.service.get(req.user, req.params),
+    }).send(res);
+  })
+  
+  invite = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Invite success.",
+      metadata: await this.service.invite(req.user, req.body),
+    }).send(res);
+  })
+
+  getAllInvitation = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get all invitation success.",
+      metadata: await this.service.getAllInvitation(req.user, req.query),
     }).send(res);
   })
 
