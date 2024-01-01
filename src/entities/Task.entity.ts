@@ -7,6 +7,7 @@ import {
 } from "typeorm";
 import { BaseAttributes } from "./attributes/BaseAttributes";
 import { UserEntity } from "./User.entity";
+import { ColumnEntity } from "./Column.entity";
 
 @Entity("tasks")
 export class TaskEntity extends BaseAttributes {
@@ -31,6 +32,9 @@ export class TaskEntity extends BaseAttributes {
   @Column({ name: "assignee_id", type: "uuid", nullable: true, default: null })
   assigneeId: string | null;
 
+  @Column({ name: "column_id", type: "uuid", nullable: false })
+  columnId: string;
+
   @ManyToOne(type => UserEntity, user => user.tasksCreated)
   @JoinColumn({ name: "author_id" })
   author: UserEntity;
@@ -38,4 +42,7 @@ export class TaskEntity extends BaseAttributes {
   @ManyToOne(type => UserEntity, user => user.tasksAssigned, { nullable: true })
   @JoinColumn({ name: "assignee_id" })
   assignee?: UserEntity;
+
+  @ManyToOne(type => ColumnEntity, column => column.tasks)
+  column: ColumnEntity;
 }

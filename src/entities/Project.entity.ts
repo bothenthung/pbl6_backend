@@ -7,6 +7,7 @@ import {
 import { BaseAttributes } from "./attributes/BaseAttributes"
 import { UserEntity } from "./User.entity"
 import { ProjectUserEntity } from "./ProjectUser.entity";
+import { ColumnEntity } from "./Column.entity";
 
 @Entity("projects")
 export class ProjectEntity extends BaseAttributes {
@@ -21,4 +22,7 @@ export class ProjectEntity extends BaseAttributes {
 
   @OneToMany(type => ProjectUserEntity, projectUser => projectUser.project)
   roles: ProjectUserEntity[]
+
+  @OneToMany(type => ColumnEntity, column => column.project)
+  columns: ColumnEntity[]
 }

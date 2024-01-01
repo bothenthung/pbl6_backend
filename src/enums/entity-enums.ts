@@ -11,3 +11,9 @@ export enum EProjectRole {
   USER = "user",
   GUEST = "guest"
 }
+
+export enum EProjectInvitationStatus {
+  ACCEPTED = 'accepted',
+  WAITING = 'waiting',
+  REJECT = 'reject',
+}

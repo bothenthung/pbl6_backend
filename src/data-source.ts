@@ -1,7 +1,6 @@
 import { DataSource } from "typeorm";
 import serverConfig from "./core/config";
 import { ColumnEntity } from "./entities/Column.entity";
-import { InvitationEntity } from "./entities/Invitation.entity";
 import { MessageEntity } from "./entities/Message.entity";
 import { NotificationEntity } from "./entities/Notification.entity";
 import { ProjectEntity } from "./entities/Project.entity";
@@ -19,7 +18,6 @@ export const AppDataSource = new DataSource({
   logging: true,
   entities: [
     ColumnEntity,
-    InvitationEntity,
     MessageEntity,
     NotificationEntity,
     ProjectEntity,
