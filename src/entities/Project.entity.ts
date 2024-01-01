@@ -3,33 +3,33 @@ import {
   Entity,
   ManyToMany,
   OneToMany,
-} from "typeorm"
-import { BaseAttributes } from "./attributes/BaseAttributes"
-import { UserEntity } from "./User.entity"
+} from "typeorm";
+import { BaseAttributes } from "./attributes/BaseAttributes";
+import { UserEntity } from "./User.entity";
 import { ProjectUserEntity } from "./ProjectUser.entity";
 import { ColumnEntity } from "./Column.entity";
 
 @Entity("projects")
 export class ProjectEntity extends BaseAttributes {
   @Column({ type: "text", nullable: false })
-  title: string
+  title: string;
 
   @Column({ type: "text", nullable: true })
-  description?: string
-
-  @ManyToMany(type => UserEntity, user => user.projects)
-  users: UserEntity[]
+  description?: string;
 
   @OneToMany(type => ProjectUserEntity, projectUser => projectUser.project)
-  roles: ProjectUserEntity[]
+  roles: ProjectUserEntity[];
 
   @OneToMany(type => ColumnEntity, column => column.project)
-  columns: ColumnEntity[]
+  columns: ColumnEntity[];
 
-  // static getAll(id: string) {
-  //   return this.createQueryBuilder("project")
-  //     .select(["user.id", "user.userName", "user.email"])
-  //     .where("user.id = :id", { id })
-  //     .getOne();
-  // }
+  static getDetailById(userId: string, projectId: string) {
+    return this.createQueryBuilder("project")
+      .select(["project.id", "project.title", "project.description"])
+      .leftJoinAndSelect("project.roles", "roles")
+      .leftJoin("project.roles", "projects_users")
+      .where("project.id = :projectId", { projectId })
+      .andWhere("projects_users.userId = :userId", { userId })
+      .getOne();
+  }
 }

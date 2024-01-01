@@ -1,6 +1,6 @@
 import QueryString from "qs";
 import { UserEntity } from "../entities/User.entity";
-import { parsePaginationQuery, parseQuery } from "../utils/pagination";
+import { parseQuery } from "../utils/pagination";
 
 export default class UserService {
   async getAll(query: QueryString.ParsedQs) {

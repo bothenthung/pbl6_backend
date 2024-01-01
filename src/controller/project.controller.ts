@@ -23,6 +23,13 @@ class ProjectController {
     }).send(res);
   })
 
+  get = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get project detail success.",
+      metadata: await this.service.get(req.user, req.params),
+    }).send(res);
+  })
+
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Create project success.",

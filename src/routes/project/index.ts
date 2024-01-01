@@ -9,6 +9,8 @@ projectRouter.post("/", projectController.create)
 
 projectRouter.get("/", projectController.getAll)
 
+projectRouter.get("/:id", projectController.get)
+
 projectRouter.post("/add", asyncHandler(projectController.addProject) as any)
 projectRouter.post(
   "/getall",

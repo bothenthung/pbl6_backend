@@ -13,7 +13,7 @@ import { ProjectEntity } from "../entities/Project.entity";
 import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
 import QueryString from "qs";
-import { parsePaginationQuery } from "../utils/pagination";
+import { parsePaginationQuery, parseQuery } from "../utils/pagination";
 
 class ProjectService {
   async create(owner: UserEntity, body: IProjectCreateReq) {
@@ -48,7 +48,7 @@ class ProjectService {
 
     if (!projectUser) throw new NotFoundError();
 
-    const projects = await ProjectEntity.find({
+    const projects = await ProjectEntity.find(parseQuery<ProjectEntity>(query, {
       where: {
         roles: {
           userId: user.id
@@ -58,14 +58,20 @@ class ProjectService {
         id: true,
         title: true,
         description: true,
-        users: true,
         updatedAt: true,
         createdAt: true,
       },
-      withDeleted: false,
-      ...parsePaginationQuery(query)
-    });
+      withDeleted: false
+    }));
     return projects;
+  }
+
+  async get(user: UserEntity, params: QueryString.ParsedQs) {
+    if (!params.id) throw new BadRequestError();
+    const project = await ProjectEntity.getDetailById(user.id, params.id as string)
+    if (!project) throw new NotFoundError();
+
+    return project;
   }
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {

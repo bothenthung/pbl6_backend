@@ -26,9 +26,6 @@ export class UserEntity extends BaseAttributes {
   loginAt: string | null;
 
   /* Project */
-  @ManyToMany(type => ProjectEntity, project => project.users)
-  projects: ProjectEntity[];
-
   @OneToMany(type => ProjectUserEntity, projectRole => projectRole.user)
   projectRoles: ProjectUserEntity[];
 
