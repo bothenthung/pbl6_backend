@@ -8,7 +8,7 @@ import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
 import { UserEntity } from "../entities/User.entity";
-import { IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
+import { IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
 import { ProjectEntity } from "../entities/Project.entity";
 import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
@@ -112,8 +112,6 @@ class ProjectService {
   }
 
   async getAllInvitation(user: UserEntity, query: QueryString.ParsedQs) {
-    console.log("dsad>>>", user, query);
-
     const projectUsers = await ProjectUserEntity.find(parseQuery<ProjectUserEntity>(query, {
       where: {
         userId: user.id
@@ -137,6 +135,28 @@ class ProjectService {
     return projectUsers;
   }
 
+  async acceptInvitation(user: UserEntity, body: IInvitationUpdateReq) {
+    const projectUser = await ProjectUserEntity.findOneBy({
+      id: body.invitationId,
+      userId: user.id
+    })
+
+    if (!projectUser) throw new NotFoundError();
+
+    if (body.isAccept) {
+      projectUser.role = projectUser.roleInvited;
+      projectUser.status = EProjectInvitationStatus.ACCEPTED;
+    } 
+    
+    if (body.isAccept === false) {
+      projectUser.status = EProjectInvitationStatus.REJECT;
+      projectUser.softRemove()
+    }
+
+    projectUser.save();
+
+    return undefined
+  }
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {
     const roles: ProjectUserEntity[] = [];

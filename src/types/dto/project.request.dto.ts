@@ -24,3 +24,8 @@ export interface IProjectInviteReq {
   userId: string;
   role: EProjectRole;
 }
+
+export interface IInvitationUpdateReq {
+  invitationId: string;
+  isAccept: boolean;
+}

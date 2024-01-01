@@ -43,6 +43,14 @@ class ProjectController {
     }).send(res);
   })
 
+  acceptInvitation = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Accept invitation success.",
+      metadata: await this.service.acceptInvitation(req.user, req.body),
+    }).send(res);
+  })
+
+  /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: "Create project success.",
