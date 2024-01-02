@@ -367,6 +367,7 @@ class ProjectService {
     task.index = tasks.length;
     task.dueDate = body.dueDate;
     task.startDate = body.startDate;
+    task.columnId = column.id;
     task.column = column;
     task.author = user;
 
