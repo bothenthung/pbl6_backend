@@ -14,9 +14,10 @@ import { Task } from "../entity/task.entity";
 import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
-import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
+import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq, ITaskCreateReq } from "../types/dto/project.request.dto";
 import { parseQuery } from "../utils/pagination";
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
+import { TaskEntity } from "../entities/Task.entity";
 
 class ProjectService {
   async create(owner: UserEntity, body: IProjectCreateReq) {
@@ -165,13 +166,13 @@ class ProjectService {
 
   async getListMessage(query: QueryString.ParsedQs) {
     let whereCondition: FindOptionsWhere<MessageEntity>[] | FindOptionsWhere<MessageEntity> =
-    { receiverId: IsNull() , projectId: query.projectId as string, };
+      { receiverId: IsNull(), projectId: query.projectId as string, };
 
-    if(query.receiverId) {
+    if (query.receiverId) {
       whereCondition = [
         { senderId: query.senderId as string, receiverId: query.receiverId as string, projectId: query.projectId as string, },
         { senderId: query.receiverId as string, receiverId: query.senderId as string, projectId: query.projectId as string, },
-      ] 
+      ];
     }
 
     const listMessages = await MessageEntity.find(parseQuery<MessageEntity>(query, {
@@ -180,7 +181,7 @@ class ProjectService {
         receiver: true
       },
       withDeleted: false
-    }))
+    }));
     return listMessages;
   }
 
@@ -317,6 +318,41 @@ class ProjectService {
 
       await column.save();
     }
+
+    return undefined;
+  }
+
+  async createTask(params: QueryString.ParsedQs, body: ITaskCreateReq) {
+    if (!params.projectId || !params.columnId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+    const column = await ColumnEntity.findOneBy({ id: params.columnId as string });
+
+    if (!project || !column) throw new NotFoundError();
+
+    const tasks = await TaskEntity.findBy({ columnId: column.id });
+
+    const task = new TaskEntity();
+    task.title = body.title;
+    task.description = body.description;
+    task.index = tasks.length;
+    task.dueDate = body.dueDate;
+    task.startDate = body.startDate;
+    task.column = column;
+
+    const assignee = await UserEntity.findOneBy({ id: body.assigneeId });
+
+    if (assignee) {
+      task.assignee = assignee;
+    }
+
+    await task.save();
+
+    // const column = new ColumnEntity();
+    // column.title = body.title;
+    // column.index = columns.length;
+    // column.project = project;
+    // await column.save();
 
     return undefined;
   }

@@ -21,10 +21,10 @@ export class TaskEntity extends BaseAttributes {
   index: number;
 
   @Column({ name: "due_date", type: "timestamp", nullable: true, default: null })
-  dueDate: Date | null;
+  dueDate?: Date | null;
 
-  @Column({ name: "end_date", type: "timestamp", nullable: true, default: null })
-  endDate: Date | null;
+  @Column({ name: "start_date", type: "timestamp", nullable: true, default: null })
+  startDate?: Date | null;
 
   @Column({ name: "author_id", type: "uuid", nullable: false })
   authorId: string;

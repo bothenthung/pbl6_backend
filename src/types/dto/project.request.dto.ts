@@ -38,3 +38,12 @@ export interface IColumnUpdateReq {
   title: string;
   index: number;
 }
+
+export interface ITaskCreateReq {
+  title: string;
+  description: string;
+  index: number;
+  dueDate?: Date;
+  startDate?: Date;
+  assigneeId?: string;
+}

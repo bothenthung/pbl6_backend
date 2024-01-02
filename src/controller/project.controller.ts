@@ -85,6 +85,13 @@ class ProjectController {
     }).send(res);
   })
 
+  createTask = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Create task success.",
+      metadata: await this.service.createTask(req.params, req.body),
+    }).send(res);
+  })
+
   /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
