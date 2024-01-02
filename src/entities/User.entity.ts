@@ -1,9 +1,9 @@
-import { Column, Entity, ManyToMany, OneToMany } from "typeorm";
-import { BaseAttributes } from "./attributes/BaseAttributes";
-import { ProjectEntity } from "./Project.entity";
-import { TaskEntity } from "./Task.entity";
+import { Column, Entity, OneToMany } from "typeorm";
+import { MessageEntity } from "./Message.entity";
 import { NotificationEntity } from "./Notification.entity";
 import { ProjectUserEntity } from "./ProjectUser.entity";
+import { TaskEntity } from "./Task.entity";
+import { BaseAttributes } from "./attributes/BaseAttributes";
 
 @Entity("users")
 export class UserEntity extends BaseAttributes {
@@ -39,6 +39,9 @@ export class UserEntity extends BaseAttributes {
   /* Notification */
   @OneToMany(type => NotificationEntity, notification => notification.receiver)
   notifications: NotificationEntity[];
+
+  @OneToMany(type => MessageEntity, message => message.receiver)
+  messages: MessageEntity[];
 
   static getPublicDataById(id: string) {
     return this.createQueryBuilder("user")
