@@ -235,8 +235,36 @@ class ProjectService {
     if (!project) throw new NotFoundError();
 
     const columns = await ColumnEntity.find({
+      relations: {
+        tasks: {
+          author: true,
+          assignee: true
+        }
+      },
+      select: {
+        id: true,
+        title: true,
+        index: true,
+        tasks: {
+          id: true,
+          title: true,
+          description: true,
+          startDate: true,
+          dueDate: true,
+          author: {
+            id: true,
+            userName: true,
+            email: true
+          },
+          assignee: {
+            id: true,
+            userName: true,
+            email: true
+          },
+        }
+      },
       where: {
-        projectId: project.id
+        projectId: project.id,
       },
       order: {
         index: "ASC"
