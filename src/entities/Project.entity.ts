@@ -25,6 +25,7 @@ export class ProjectEntity extends BaseAttributes {
     return this.createQueryBuilder("project")
       .select(["project.id", "project.title", "project.description"])
       .leftJoinAndSelect("project.roles", "roles")
+      .leftJoinAndSelect("roles.user", "user")
       .leftJoin("project.roles", "projects_users")
       .where("project.id = :projectId", { projectId })
       .andWhere("projects_users.userId = :userId", { userId })
