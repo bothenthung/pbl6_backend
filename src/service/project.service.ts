@@ -118,7 +118,8 @@ class ProjectService {
 
     const projectUsers = await ProjectUserEntity.find(parseQuery<ProjectUserEntity>(query, {
       where: {
-        userId: user.id
+        userId: user.id,
+        status: EProjectInvitationStatus.WAITING
       },
       select: {
         id: true,
@@ -370,6 +371,81 @@ class ProjectService {
     });
 
     return tasks;
+  }
+
+  async updateTask(params: QueryString.ParsedQs, body: IColumnUpdateReq) {
+    if (!params.projectId || !params.columnId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+    const column = await ColumnEntity.findOneBy({ id: params.columnId as string });
+    const task = await TaskEntity.findOneBy({ id: params.taskId as string });
+
+    if (!project || !column || !task) throw new NotFoundError();
+
+    if (body.index > task.index) {
+      let indexes: number[] = [];
+      const tasksChange = await TaskEntity.find({
+        where: {
+          columnId: column.id,
+          index: Between(task.index, body.index)
+        },
+        order: {
+          index: "asc"
+        },
+        withDeleted: false
+      });
+
+      for (let i = 0; i < tasksChange.length; i++) {
+        if (i === 0) {
+          indexes[i] = tasksChange[tasksChange.length - 1].index;
+        } else {
+          indexes[i] = tasksChange[i].index - 1;
+        }
+      }
+
+      Promise.all(tasksChange.map((record, index) => {
+        record.index = indexes[index];
+
+        if (index === 0) {
+          record.title = body.title;
+        }
+        return record.save();
+      }));
+    } else if (body.index < task.index) {
+      let indexes: number[] = [];
+      const tasksChange = await TaskEntity.find({
+        where: {
+          columnId: column.id,
+          index: Between(body.index, task.index)
+        },
+        order: {
+          index: "asc"
+        },
+        withDeleted: false
+      });
+
+      for (let i = 0; i < tasksChange.length; i++) {
+        if (i === tasksChange.length - 1) {
+          indexes[i] = tasksChange[0].index;
+        } else {
+          indexes[i] = tasksChange[i].index + 1;
+        }
+      }
+
+      Promise.all(tasksChange.map((record, index) => {
+        record.index = indexes[index];
+        if (index === tasksChange.length - 1) {
+          record.title = body.title;
+        }
+        return record.save();
+      }));
+    } else {
+      task.title = body.title;
+
+      await task.save();
+    }
+
+    return undefined;
   }
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {

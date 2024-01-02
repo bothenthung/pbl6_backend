@@ -42,8 +42,17 @@ export interface IColumnUpdateReq {
 export interface ITaskCreateReq {
   title: string;
   description: string;
-  index: number;
   dueDate?: Date;
   startDate?: Date;
   assigneeId?: string;
 }
+
+export interface ITaskUpdateReq {
+  title: string;
+  description: string;
+  dueDate?: Date;
+  startDate?: Date;
+  assigneeId?: string;
+  index: number;
+}
+
