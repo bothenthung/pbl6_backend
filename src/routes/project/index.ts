@@ -23,11 +23,15 @@ projectRouter.get("/invitation", projectController.getAllInvitation);
 
 projectRouter.put("/invitation", projectController.acceptInvitation);
 
-projectRouter.post("/:projectId/columns", projectController.createColumn);
-
 projectRouter.get("/:projectId/columns", projectController.getAllColumns);
 
+projectRouter.post("/:projectId/columns", projectController.createColumn);
+
 projectRouter.put("/:projectId/columns/:columnId", projectController.updateColumn)
+
+projectRouter.get("/:projectId/users", projectController.getUserInProject)
+
+projectRouter.get("/:projectId/messages", projectController.getListMessage)
 
 projectRouter.post("/add", asyncHandler(projectController.addProject) as any);
 projectRouter.post(

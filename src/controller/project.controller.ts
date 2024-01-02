@@ -71,6 +71,20 @@ class ProjectController {
     }).send(res);
   })
 
+  getUserInProject = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get list user success.",
+      metadata: await this.service.getAllUserInProject(req.user , req.params, req.body),
+    }).send(res);
+  })
+
+  getListMessage = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get list user success.",
+      metadata: await this.service.getListMessage(req.query),
+    }).send(res);
+  })
+
   /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({

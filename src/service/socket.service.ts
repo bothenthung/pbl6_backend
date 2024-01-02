@@ -1,7 +1,7 @@
 import { MessageEntity } from "../entity/message.entity";
 import { IJoinRoomChat } from "../types/socket";
 import { sortId } from "../utils/user.utils";
-import { messageService } from "./message.service";
+import messageService from "./message.service";
 
 const listUser = new Map<string, IJoinRoomChat>();
 
@@ -23,21 +23,17 @@ export const socketServices = (socket: any) => {
     }
   })
 
-  socket.on('send-message', async (data: any) => {
+  socket.on('send-message', async (data: Partial<MessageEntity>) => {
     try {
-      const message = await messageService.create(data) as any as MessageEntity;
+      const message = await messageService.create(data);
 
-      let roomName = message.projectID + 'group-chat';
+      let roomName = message.projectId + 'group-chat';
 
-      if(message.userReceiveId) {
-        roomName = message.projectID + sortId(message.userSendId, message.userReceiveId);
+      if(message.receiverId) {
+        roomName = message.projectId + sortId(message.senderId, message.receiverId);
       }
 
-      const messageRes = await messageService.getLatestMessagePersonal({
-          userSendId: message.userSendId,
-          userReceiveId: message.userReceiveId,
-          projectID: message.projectID,
-      });
+      const messageRes = await messageService.getLatest(message.id);
 
       (global as any).socket.to(roomName).emit('receive-message', messageRes);
     }

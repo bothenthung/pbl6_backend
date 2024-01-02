@@ -1,21 +1,22 @@
 import { Request } from "express";
+import QueryString from "qs";
+import { Between, FindOptionsWhere, IsNull, Not } from "typeorm";
 import { BadRequestError, NotFoundError } from "../core/error.response";
 import { AppDataSource } from "../data-source";
+import { ColumnEntity } from "../entities/Column.entity";
+import { MessageEntity } from "../entities/Message.entity";
+import { ProjectEntity } from "../entities/Project.entity";
+import { ProjectUserEntity } from "../entities/ProjectUser.entity";
+import { UserEntity } from "../entities/User.entity";
 import { Columns } from "../entity/column.entity";
 import { Project } from "../entity/project.entity";
 import { Task } from "../entity/task.entity";
 import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
-import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
-import { UserEntity } from "../entities/User.entity";
-import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
-import { ProjectEntity } from "../entities/Project.entity";
-import { ProjectUserEntity } from "../entities/ProjectUser.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
-import QueryString from "qs";
+import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq } from "../types/dto/project.request.dto";
 import { parseQuery } from "../utils/pagination";
-import { Between, IsNull, MoreThan, Not } from "typeorm";
-import { ColumnEntity } from "../entities/Column.entity";
+import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
 
 class ProjectService {
   async create(owner: UserEntity, body: IProjectCreateReq) {
@@ -113,6 +114,7 @@ class ProjectService {
   }
 
   async getAllInvitation(user: UserEntity, query: QueryString.ParsedQs) {
+
     const projectUsers = await ProjectUserEntity.find(parseQuery<ProjectUserEntity>(query, {
       where: {
         userId: user.id
@@ -134,6 +136,52 @@ class ProjectService {
     }));
 
     return projectUsers;
+  }
+
+  async getAllUserInProject(user: UserEntity, params: QueryString.ParsedQs, query: QueryString.ParsedQs) {
+    const projectUsers = await ProjectUserEntity.find(parseQuery<ProjectUserEntity>(query, {
+      where: {
+        projectId: params.id as string,
+        status: EProjectInvitationStatus.ACCEPTED
+      },
+      select: {
+        id: true,
+        roleInvited: true,
+        status: true,
+        user: {
+          id: true,
+          email: true,
+          userName: true,
+        }
+      },
+      relations: {
+        user: true
+      },
+      withDeleted: false
+    }));
+
+    return projectUsers;
+  }
+
+  async getListMessage(query: QueryString.ParsedQs) {
+    let whereCondition: FindOptionsWhere<MessageEntity>[] | FindOptionsWhere<MessageEntity> =
+    { receiverId: IsNull() , projectId: query.projectId as string, };
+
+    if(query.receiverId) {
+      whereCondition = [
+        { senderId: query.senderId as string, receiverId: query.receiverId as string, projectId: query.projectId as string, },
+        { senderId: query.receiverId as string, receiverId: query.senderId as string, projectId: query.projectId as string, },
+      ] 
+    }
+
+    const listMessages = await MessageEntity.find(parseQuery<MessageEntity>(query, {
+      where: whereCondition,
+      relations: {
+        receiver: true
+      },
+      withDeleted: false
+    }))
+    return listMessages;
   }
 
   async acceptInvitation(user: UserEntity, body: IInvitationUpdateReq) {
