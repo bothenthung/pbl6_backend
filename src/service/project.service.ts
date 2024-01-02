@@ -348,13 +348,28 @@ class ProjectService {
 
     await task.save();
 
-    // const column = new ColumnEntity();
-    // column.title = body.title;
-    // column.index = columns.length;
-    // column.project = project;
-    // await column.save();
-
     return undefined;
+  }
+
+  async getAllTasks(params: QueryString.ParsedQs) {
+    if (!params.projectId || !params.columnId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+    const column = await ColumnEntity.findOneBy({ id: params.columnId as string });
+
+    if (!project || !column) throw new NotFoundError();
+
+    const tasks = await TaskEntity.find({
+      where: {
+        columnId: column.id
+      },
+      order: {
+        index: "ASC"
+      },
+      withDeleted: false
+    });
+
+    return tasks;
   }
 
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {

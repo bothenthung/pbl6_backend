@@ -91,6 +91,14 @@ class ProjectController {
       metadata: await this.service.createTask(req.params, req.body),
     }).send(res);
   })
+  
+  getAllTasks = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Get tasks success.",
+      metadata: await this.service.getAllTasks(req.params),
+    }).send(res);
+  })
+  
 
   /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {

@@ -31,6 +31,8 @@ projectRouter.put("/:projectId/columns/:columnId", projectController.updateColum
 
 projectRouter.post("/:projectId/columns/:columnId/tasks", projectController.createTask);
 
+projectRouter.get("/:projectId/columns/:columnId/tasks", projectController.getAllTasks);
+
 projectRouter.get("/:projectId/users", projectController.getUserInProject)
 
 projectRouter.get("/:projectId/messages", projectController.getListMessage)
