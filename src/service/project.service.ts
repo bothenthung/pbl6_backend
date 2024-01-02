@@ -351,7 +351,7 @@ class ProjectService {
     return undefined;
   }
 
-  async createTask(params: QueryString.ParsedQs, body: ITaskCreateReq) {
+  async createTask(user: UserEntity, params: QueryString.ParsedQs, body: ITaskCreateReq) {
     if (!params.projectId || !params.columnId) throw new BadRequestError();
 
     const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
@@ -368,6 +368,7 @@ class ProjectService {
     task.dueDate = body.dueDate;
     task.startDate = body.startDate;
     task.column = column;
+    task.author = user;
 
     const assignee = await UserEntity.findOneBy({ id: body.assigneeId });
 
