@@ -44,5 +44,6 @@ export class TaskEntity extends BaseAttributes {
   assignee?: UserEntity;
 
   @ManyToOne(type => ColumnEntity, column => column.tasks)
+  @JoinColumn({ name: "column_id" })
   column: ColumnEntity;
 }
