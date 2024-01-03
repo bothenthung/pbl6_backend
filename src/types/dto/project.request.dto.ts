@@ -54,5 +54,7 @@ export interface ITaskUpdateReq {
   startDate?: Date;
   assigneeId?: string;
   index: number;
+  sourceColumnId: string;
+  targetColumnId: string;
 }
 

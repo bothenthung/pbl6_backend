@@ -1,6 +1,6 @@
 import { Request } from "express";
 import QueryString from "qs";
-import { Between, FindOptionsWhere, IsNull, Not } from "typeorm";
+import { Between, FindOptionsWhere, IsNull, MoreThan, MoreThanOrEqual, Not } from "typeorm";
 import { BadRequestError, NotFoundError } from "../core/error.response";
 import { AppDataSource } from "../data-source";
 import { ColumnEntity } from "../entities/Column.entity";
@@ -14,7 +14,7 @@ import { Task } from "../entity/task.entity";
 import { User } from "../entity/user.entity";
 import { UserProject } from "../entity/userProject.entity";
 import { EProjectInvitationStatus, EProjectRole } from "../enums/entity-enums";
-import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq, ITaskCreateReq } from "../types/dto/project.request.dto";
+import { IColumnCreateReq, IColumnUpdateReq, IInvitationUpdateReq, IProjectCreateReq, IProjectInviteReq, IProjectUserReq, ITaskCreateReq, ITaskUpdateReq } from "../types/dto/project.request.dto";
 import { parseQuery } from "../utils/pagination";
 import { CheckProjectExists, checkUserInProject } from "../utils/project.utils";
 import { TaskEntity } from "../entities/Task.entity";
@@ -403,76 +403,45 @@ class ProjectService {
     return tasks;
   }
 
-  async updateTask(params: QueryString.ParsedQs, body: IColumnUpdateReq) {
-    if (!params.projectId || !params.columnId) throw new BadRequestError();
+  async updateTask(params: QueryString.ParsedQs, body: ITaskUpdateReq) {
+    if (!params.projectId || !params.taskId) throw new BadRequestError();
 
     const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
-    const column = await ColumnEntity.findOneBy({ id: params.columnId as string });
     const task = await TaskEntity.findOneBy({ id: params.taskId as string });
 
-    if (!project || !column || !task) throw new NotFoundError();
+    if (!project || !task) throw new NotFoundError();
 
-    if (body.index > task.index) {
-      let indexes: number[] = [];
-      const tasksChange = await TaskEntity.find({
-        where: {
-          columnId: column.id,
-          index: Between(task.index, body.index)
-        },
-        order: {
-          index: "asc"
-        },
-        withDeleted: false
-      });
+    if (body.index && body.sourceColumnId && body.targetColumnId) {
+      if (body.sourceColumnId === body.targetColumnId) {
+        const column = await ColumnEntity.findOneBy({ id: body.sourceColumnId });
 
-      for (let i = 0; i < tasksChange.length; i++) {
-        if (i === 0) {
-          indexes[i] = tasksChange[tasksChange.length - 1].index;
-        } else {
-          indexes[i] = tasksChange[i].index - 1;
-        }
+        if (!column) throw new NotFoundError();
+        const tasks = await this.getTasksInColumnByIndexRange(column, ...[task.index, body.index].sort((a, b) => a - b) as [number, number]);
+        const tasksSorted = await this.sortItems(tasks, task.index, body.index);
+
+        await Promise.all(tasksSorted.map(record => record.save()));
+      } else {
+        const sourceColumn = await ColumnEntity.findOneBy({ id: body.sourceColumnId });
+        const targetColumn = await ColumnEntity.findOneBy({ id: body.targetColumnId });
+
+        if (!sourceColumn || !targetColumn) throw new NotFoundError();
+
+        const tasksInSourceColumn = await this.getTasksInColumnFromIndex(sourceColumn, task.index, false);
+        const tasksInSourceColumnSorted =  await this.addOrMinusItemsIndex(tasksInSourceColumn, -1);
+
+        const tasksInTargetColumn = await this.getTasksInColumnFromIndex(targetColumn, body.index, true);
+        const tasksInTargetColumnSorted = await this.addOrMinusItemsIndex(tasksInTargetColumn, 1);
+
+        await Promise.all([...tasksInSourceColumnSorted, ...tasksInTargetColumnSorted].map(record => record.save()));
+
+        task.index = body.index;
+        task.columnId = targetColumn.id;
+        task.column = targetColumn;
+
+        await task.save();
       }
-
-      Promise.all(tasksChange.map((record, index) => {
-        record.index = indexes[index];
-
-        if (index === 0) {
-          record.title = body.title;
-        }
-        return record.save();
-      }));
-    } else if (body.index < task.index) {
-      let indexes: number[] = [];
-      const tasksChange = await TaskEntity.find({
-        where: {
-          columnId: column.id,
-          index: Between(body.index, task.index)
-        },
-        order: {
-          index: "asc"
-        },
-        withDeleted: false
-      });
-
-      for (let i = 0; i < tasksChange.length; i++) {
-        if (i === tasksChange.length - 1) {
-          indexes[i] = tasksChange[0].index;
-        } else {
-          indexes[i] = tasksChange[i].index + 1;
-        }
-      }
-
-      Promise.all(tasksChange.map((record, index) => {
-        record.index = indexes[index];
-        if (index === tasksChange.length - 1) {
-          record.title = body.title;
-        }
-        return record.save();
-      }));
     } else {
-      task.title = body.title;
-
-      await task.save();
+      await this.updateTaskDetail(task, body);
     }
 
     return undefined;
@@ -503,6 +472,81 @@ class ProjectService {
     project.roles = [...project.roles, ...roles];
 
     await project.save();
+  }
+
+  async updateTaskDetail(task: TaskEntity, body: ITaskUpdateReq) {
+    if (body.title) task.title = body.title;
+    if (body.description) task.description = body.description;
+    if (body.dueDate) task.dueDate = body.dueDate;
+    if (body.startDate) task.startDate = body.startDate;
+    if (body.assigneeId) {
+      const assignee = await UserEntity.findOneBy({ id: body.assigneeId });
+      if (assignee) {
+        task.assignee = assignee;
+      }
+    }
+
+    await task.save();
+  }
+
+  async sortItems(entities: TaskEntity[] | ColumnEntity[], sourceIndex: number, targetIndex: number) {
+    if (sourceIndex > targetIndex) {
+      const firstIndex = entities[0].index;
+      entities[entities.length - 1].index = firstIndex;
+
+      for (let i = 0; i < entities.length - 2; i++) {
+        entities[i].index = entities[i].index + 1;
+      }
+    }
+
+    if (sourceIndex < targetIndex) {
+      const lastIndex = entities[entities.length - 1].index;
+      entities[0].index = lastIndex;
+
+      for (let i = 1; i < entities.length - 1; i++) {
+        entities[i].index = entities[i].index - 1;
+      }
+    }
+    return entities;
+  }
+
+  async addOrMinusItemsIndex(entities: TaskEntity[] | ColumnEntity[], indexChange: 1 | -1) {
+    for (const entity of entities) {
+      entity.index = entity.index + indexChange;
+    }
+    return entities;
+  };
+
+  async getTasksInColumnByIndexRange(column: ColumnEntity, indexStart: number, indexEnd: number) {
+    const result = await TaskEntity.find({
+      where: {
+        columnId: column.id,
+        index: Between(indexStart, indexEnd)
+      },
+      order: {
+        index: "ASC"
+      },
+      withDeleted: false
+    });
+
+    return result;
+  }
+
+  async getTasksInColumnFromIndex(column: ColumnEntity, index: number, isIncludeIndex: boolean) {
+    const whereHelperMethod = isIncludeIndex ? MoreThanOrEqual : MoreThan;
+
+    const result = await TaskEntity.find({
+      where: {
+        columnId: column.id,
+        index: whereHelperMethod(index)
+      },
+      order: {
+        index: "ASC"
+      },
+      withDeleted: false
+    });
+
+    return result;
   }
 
   /** @deprecated */

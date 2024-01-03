@@ -92,10 +92,10 @@ class ProjectController {
     }).send(res);
   })
   
-  getAllTasks = catchAsync(async (req, res) => {
+  updateTask = catchAsync(async (req, res) => {
     new SuccessResponse({
-      message: "Get tasks success.",
-      metadata: await this.service.getAllTasks(req.params),
+      message: "Update task success.",
+      metadata: await this.service.updateTask(req.params, req.body),
     }).send(res);
   })
   
