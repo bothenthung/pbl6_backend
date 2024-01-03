@@ -415,15 +415,17 @@ class ProjectService {
 
     if (!project || !task) throw new NotFoundError();
 
-    if (body.index && body.sourceColumnId && body.targetColumnId) {
+
+    if (body.index >= 0 && body.sourceColumnId && body.targetColumnId) {
       if (body.sourceColumnId === body.targetColumnId) {
         const column = await ColumnEntity.findOneBy({ id: body.sourceColumnId });
 
         if (!column) throw new NotFoundError();
-        const tasks = await this.getTasksInColumnByIndexRange(column, ...[task.index, body.index].sort((a, b) => a - b) as [number, number]);
-        const tasksSorted = await this.sortItems(tasks, task.index, body.index);
+        
 
-        await Promise.all(tasksSorted.map(record => record.save()));
+        const tasks = await this.getTasksInColumnByIndexRange(column, ...[task.index, body.index].sort((a, b) => a - b) as [number, number]);
+        console.log(tasks);
+        await this.sortItems(tasks, task.index, body.index);
       } else {
         const sourceColumn = await ColumnEntity.findOneBy({ id: body.sourceColumnId });
         const targetColumn = await ColumnEntity.findOneBy({ id: body.targetColumnId });
@@ -431,12 +433,10 @@ class ProjectService {
         if (!sourceColumn || !targetColumn) throw new NotFoundError();
 
         const tasksInSourceColumn = await this.getTasksInColumnFromIndex(sourceColumn, task.index, false);
-        const tasksInSourceColumnSorted =  await this.addOrMinusItemsIndex(tasksInSourceColumn, -1);
+        await this.addOrMinusItemsIndex(tasksInSourceColumn, -1);
 
         const tasksInTargetColumn = await this.getTasksInColumnFromIndex(targetColumn, body.index, true);
-        const tasksInTargetColumnSorted = await this.addOrMinusItemsIndex(tasksInTargetColumn, 1);
-
-        await Promise.all([...tasksInSourceColumnSorted, ...tasksInTargetColumnSorted].map(record => record.save()));
+        await this.addOrMinusItemsIndex(tasksInTargetColumn, 1);
 
         task.index = body.index;
         task.columnId = targetColumn.id;
@@ -495,30 +495,32 @@ class ProjectService {
 
   async sortItems(entities: TaskEntity[] | ColumnEntity[], sourceIndex: number, targetIndex: number) {
     if (sourceIndex > targetIndex) {
-      const firstIndex = entities[0].index;
-      entities[entities.length - 1].index = firstIndex;
+      entities[entities.length - 1].index = targetIndex;
 
-      for (let i = 0; i < entities.length - 2; i++) {
-        entities[i].index = entities[i].index + 1;
+      for (let i = 0; i < entities.length - 1; i++) {
+        if (i < entities.length - 1) {
+          entities[i].index = entities[i].index + 1;
+        }
       }
     }
 
     if (sourceIndex < targetIndex) {
-      const lastIndex = entities[entities.length - 1].index;
-      entities[0].index = lastIndex;
+      entities[0].index = targetIndex;
 
-      for (let i = 1; i < entities.length - 1; i++) {
-        entities[i].index = entities[i].index - 1;
+      for (let i = 1; i < entities.length; i++) {
+        if (i < entities.length) {
+          entities[i].index = entities[i].index - 1;
+        }
       }
     }
-    return entities;
+    await Promise.all(entities.map(record => record.save()));
   }
 
   async addOrMinusItemsIndex(entities: TaskEntity[] | ColumnEntity[], indexChange: 1 | -1) {
-    for (const entity of entities) {
+    for await (const entity of entities) {
       entity.index = entity.index + indexChange;
+      await entity.save();
     }
-    return entities;
   };
 
   async getTasksInColumnByIndexRange(column: ColumnEntity, indexStart: number, indexEnd: number) {
