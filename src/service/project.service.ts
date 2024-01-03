@@ -251,6 +251,7 @@ class ProjectService {
           description: true,
           startDate: true,
           dueDate: true,
+          index: true,
           author: {
             id: true,
             userName: true,
@@ -267,7 +268,10 @@ class ProjectService {
         projectId: project.id,
       },
       order: {
-        index: "ASC"
+        index: "ASC",
+        tasks: {
+          index: "ASC"
+        }
       },
       withDeleted: false
     });
