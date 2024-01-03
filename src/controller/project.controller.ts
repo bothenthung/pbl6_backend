@@ -99,6 +99,13 @@ class ProjectController {
     }).send(res);
   })
   
+  deleteTask = catchAsync(async (req, res) => {
+    new SuccessResponse({
+      message: "Delete task success.",
+      metadata: await this.service.deleteTask(req.user, req.params),
+    }).send(res);
+  })
+  
 
   /** @deprecated */
   addProject = async (req: Request, res: Response, next: NextFunction) => {

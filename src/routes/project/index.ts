@@ -33,6 +33,8 @@ projectRouter.post("/:projectId/columns/:columnId/tasks", projectController.crea
 
 projectRouter.put("/:projectId/tasks/:taskId", projectController.updateTask);
 
+projectRouter.delete("/:projectId/columns/:columnId/tasks/:taskId", projectController.updateTask);
+
 projectRouter.get("/:projectId/users", projectController.getUserInProject)
 
 projectRouter.get("/:projectId/messages", projectController.getListMessage)

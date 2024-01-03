@@ -451,6 +451,24 @@ class ProjectService {
     return undefined;
   }
 
+  async deleteTask(user: UserEntity, params: QueryString.ParsedQs) {
+    if (!params.projectId || !params.columnId || !params.taskId) throw new BadRequestError();
+
+    const project = await ProjectEntity.findOneBy({ id: params.projectId as string });
+    const task = await TaskEntity.findOneBy({ id: params.taskId as string });
+    const column = await ColumnEntity.findOneBy({ id:  params.columnId as string });
+
+    if (!project || !column || !task) throw new NotFoundError();
+
+    await task.softRemove();
+
+    const tasksBehind = await this.getTasksInColumnFromIndex(column, task.index, false);
+
+    await this.addOrMinusItemsIndex(tasksBehind, -1);
+
+    return undefined;
+  }
+
   async addUsersToProjectAndSave(projectUsers: IProjectUserReq[], project: ProjectEntity) {
     const roles: ProjectUserEntity[] = [];
 
