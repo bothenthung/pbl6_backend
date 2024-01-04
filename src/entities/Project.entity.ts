@@ -25,13 +25,13 @@ export class ProjectEntity extends BaseAttributes {
 
   static getDetailById(userId: string, projectId: string) {
     return this.createQueryBuilder("project")
-      .select(["project.id", "project.title", "project.description"])
       .leftJoinAndSelect("project.roles", "roles")
       .leftJoinAndSelect("roles.user", "user")
       .leftJoin("project.roles", "projects_users")
       .leftJoinAndMapOne("project.role", "project.roles", "role", "role.userId = :userId", { userId })
       .where("project.id = :projectId", { projectId })
       .andWhere("projects_users.userId = :userId", { userId })
+      .select(["project.id", "project.title", "project.description", "role.role"])
       .getOne();
   }
 }

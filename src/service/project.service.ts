@@ -94,7 +94,8 @@ class ProjectService {
     const oldProjectUsers = await ProjectUserEntity.findOne({
       where: {
         userId: body.userId,
-        status: Not(EProjectInvitationStatus.REJECT)
+        status: Not(EProjectInvitationStatus.REJECT),
+        projectId: body.projectId,
       }
     });
 
